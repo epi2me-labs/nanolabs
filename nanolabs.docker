@@ -1,0 +1,22 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+# Modified for and by Oxford Nanopore Technologies
+ARG BASE_CONTAINER=ontresearch/picolabs-notebook
+FROM $BASE_CONTAINER
+
+LABEL maintainer="Oxford Nanopore Technologies"
+
+USER $NB_UID
+
+# Install Python 3 packages
+RUN conda install --quiet --yes \
+    'medaka' \
+    'pomoxis' \
+    && \
+    conda clean --all -f -y && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+
+USER $NB_UID
+
