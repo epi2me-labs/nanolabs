@@ -33,15 +33,16 @@ nanolabs-notebook:
 > docker build --rm --force-rm $(NANOLABSARGS) -t $(OWNER)/$@:latest -f nanolabs.docker .
 
 
-datamount=$(shell pwd)
+datamount:=$(shell pwd)/labfolder
 token=$(shell head /dev/random | openssl sha1)
 
 run:
+> mkdir -p $(datamount)
 > docker run \
   -p 8888:8888 \
   -e JUPYTER_ENABLE_LAB=yes \
   -v $(datamount):/home/jovyan/work \
-  ontresearch/picolabs-notebook \
+  ontresearch/nanolabs-notebook \
   start-notebook.sh \
   --NotebookApp.allow_origin='https://colab.research.google.com' \
   --port=8888 \
