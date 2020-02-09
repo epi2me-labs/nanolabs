@@ -34,8 +34,9 @@ nanolabs-notebook:
 
 
 datamount:=$(shell pwd)/labfolder
-token=$(shell head /dev/random | openssl sha1)
+token:=$(shell head /dev/random | openssl sha1)
 
+.PHONY: run
 run:
 > mkdir -p $(datamount)
 > docker run \

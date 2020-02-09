@@ -42,6 +42,9 @@ RUN conda config --system --append channels bioconda \
     jupyter labextension install jupyterlab-plotly@1.5.0 --no-build && \
     jupyter labextension install plotlywidget@1.5.0 --no-build && \
     unset NODE_OPTIONS && \
+    # github extension
+    jupyter labextension install @jupyterlab/github --no-build && \
+    pip install jupyterlab_github && \
     # build lab
     jupyter lab build && \
     # clean up

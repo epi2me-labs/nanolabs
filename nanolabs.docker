@@ -6,17 +6,29 @@ FROM $BASE_CONTAINER
 
 LABEL maintainer="Oxford Nanopore Technologies"
 
+USER root
+
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    vim \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Add run helper command for notebooks to run commands from conda envs
+COPY run_from_env ${CONDA_DIR}/bin/run
+RUN chmod a+rx ${CONDA_DIR}/bin/run
+
 USER $NB_UID
 
-# Install Python 3 packages
-RUN conda install --quiet --yes \
-    'medaka' \
-    'pomoxis' \
-    && \
-    conda clean --all -f -y && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+# Install additional modules into root, and programs into separate conda envs
+RUN \
+    conda install --quiet --yes pycoQC && \
+    conda create --quiet --yes -n ont pomoxis medaka flye
+
+#RUN wget https://github.com/chanzuckerberg/shasta/releases/download/0.4.0/shasta-Linux-0.4.0 \
+# && mv shasta-Linux-0.4.0 ${CONDA_DIR}bin/shasta
 
 
+
+
+# Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
-
