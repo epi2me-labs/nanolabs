@@ -40,14 +40,17 @@ token:=$(shell head /dev/random | openssl sha1)
 run:
 > mkdir -p $(datamount)
 > docker run \
+  -d \
   -p 8888:8888 \
   -e JUPYTER_ENABLE_LAB=yes \
   -v $(datamount):/home/jovyan/work \
   ontresearch/nanolabs-notebook \
   start-notebook.sh \
   --NotebookApp.allow_origin='https://colab.research.google.com' \
+  --NotebookApp.disable_check_xsrf=True \
   --port=8888 \
   --NotebookApp.port_retries=0 \
   --ip=0.0.0.0 \
+  --no-browser \
   --NotebookApp.token=$(token) \
   --notebook-dir=./work
