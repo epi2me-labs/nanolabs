@@ -14,8 +14,8 @@ endif
 OWNER := ontresearch
 BASEARGS     = --build-arg PYTHON_VERSION=3.6
 MINIMALARGS  = --build-arg BASE_CONTAINER=$(OWNER)/base-notebook
+PICOLABSARGS = --build-arg BASE_CONTAINER=$(OWNER)/minimal-notebook
 NANOLABSARGS = --build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook
-PICOLABSARGS = --build-arg BASE_CONTAINER=$(OWNER)/nanolabs-notebook
 
 
 base-notebook:
