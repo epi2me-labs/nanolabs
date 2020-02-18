@@ -10,24 +10,24 @@ USER root
 
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
-    vim \
+    vim tree \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Add run helper command for notebooks to run commands from conda envs
-COPY run_from_env ${CONDA_DIR}/bin/run
-RUN chmod a+rx ${CONDA_DIR}/bin/run
 
 USER $NB_UID
 
 # Install additional modules into root, and programs into separate conda envs
 RUN \
-    conda install --quiet --yes pycoQC && \
+    conda install --quiet --yes pyranges pysam && \
     conda create --quiet --yes -n ont pomoxis medaka flye
 
-#RUN wget https://github.com/chanzuckerberg/shasta/releases/download/0.4.0/shasta-Linux-0.4.0 \
-# && mv shasta-Linux-0.4.0 ${CONDA_DIR}bin/shasta
+# Add run helper command for notebooks to run commands from conda envs
+USER root
+COPY run_from_env ${CONDA_DIR}/bin/run
+RUN chmod a+rx ${CONDA_DIR}/bin/run
 
-
+# Simple concatenation of fastq
+COPY concatenate_fastqs ${CONDA_DIR}/bin/
+RUN chmod a+rx ${CONDA_DIR}/bin/concatenate_fastqs
 
 
 # Switch back to jovyan to avoid accidental container runs as root

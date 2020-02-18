@@ -16,21 +16,26 @@ RUN apt-get update && \
 USER $NB_UID
 
 # Install Python 3 packages
-RUN conda config --system --append channels bioconda \
-    && \
+RUN \
+    conda config --system --append channels bioconda && \
     conda install --quiet --yes \
-    'conda-forge::blas=*=openblas' \
-    'ipywidgets=7.5.*' \
-    'matplotlib-base=3.1.*' \
-    'pandas=0.25.*' \
-    'protobuf=3.11.*' \
-    'plotly' \
-    'scikit-learn=0.22.*' \
-    'scipy=1.4.*' \
-    'seaborn=0.9.*' \
-    'xlrd' \
-    && \
+        'bokeh' \
+        'conda-forge::blas=*=openblas' \
+        'ipywidgets=7.5.*' \
+        'matplotlib-base=3.1.*' \
+        'pandas=0.25.*' \
+        'protobuf=3.11.*' \
+        'plotly' \
+        'scikit-learn=0.22.*' \
+        'scipy=1.4.*' \
+        'seaborn=0.9.*' \
+        'xlrd' && \
     conda clean --all -f -y && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+# jupyter extensions
+RUN \
     # Activate ipywidgets extension in the environment that runs the notebook server
     jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
     # Also activate ipywidgets extension for JupyterLab
@@ -38,16 +43,22 @@ RUN conda config --system --append channels bioconda \
     # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
     jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.1 --no-build && \
     # plotly - https://plot.ly/python/getting-started/#jupyterlab-support-python-35
-    export NODE_OPTIONS=--max-old-space-size=4096 && \
-    jupyter labextension install jupyterlab-plotly@1.5.0 --no-build && \
-    jupyter labextension install plotlywidget@1.5.0 --no-build && \
-    unset NODE_OPTIONS && \
+    # DISABLED: breaks web socket connections with medium-sized data
+    #export NODE_OPTIONS=--max-old-space-size=4096 && \
+    #jupyter labextension install jupyterlab-plotly@1.5.0 --no-build && \
+    #jupyter labextension install plotlywidget@1.5.0 --no-build && \
+    #unset NODE_OPTIONS && \
+    # colab extension
+    pip install jupyter_http_over_ws && \
+    jupyter serverextension enable --py jupyter_http_over_ws && \
+    # bokeh
+    jupyter labextension install @bokeh/jupyter_bokeh --no-build && \
     # github extension
-    jupyter labextension install @jupyterlab/github --no-build && \
-    pip install jupyterlab_github && \
-    # build lab
+    # DISABLED: not needed in colab
+    #jupyter labextension install @jupyterlab/github --no-build && \
+    #pip install jupyterlab_github && \
+    # build things
     jupyter lab build && \
-    # clean up
     npm cache clean --force && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
