@@ -1,0 +1,34 @@
+stages:
+  - build_pico
+  - build_nano
+
+
+.build_docker_image_generic: &build_docker_image_generic
+  image: git.oxfordnanolabs.local:4567/metrichor-bio/docker_test_images/docker_builder:master
+  tags:
+    - docker-builder
+  script:
+    - sh /build.sh
+  rules:
+    - if: "$RUN_ALL == 'TRUE'"
+      when: on_success
+    - changes:
+      - ${DOCKERFILE}
+
+
+build_picolabs_image:
+  variables:
+    DOCKERFILE: picolabs.docker
+    NAME: ${CI_PROJECT_PATH}/picolabs
+    VERSION: "something"
+  stage: build_pico
+  <<: *build_docker_image_generic
+
+
+build_nanolabs_image:
+  variables:
+    DOCKERFILE: nanolabs.docker
+    NAME: ${CI_PROJECT_PATH}/nanolabs
+    VERSION: "something"
+  stage: build_nano
+  <<: *build_docker_image_generic

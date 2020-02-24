@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 # Modified for and by Oxford Nanopore Technologies
-ARG BASE_CONTAINER=ontresearch/minimal-notebook
+ARG BASE_CONTAINER=jupyter/minimal-notebook
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Oxford Nanopore Technologies"
