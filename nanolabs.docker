@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 # Modified for and by Oxford Nanopore Technologies
-ARG BASE_CONTAINER=ontresearch/picolabs-notebook
+ARG BASE_CONTAINER=git.oxfordnanolabs.local:4567/custflow/nanolabs/picolabs:latest
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Oxford Nanopore Technologies"
@@ -26,8 +26,8 @@ COPY run_from_env ${CONDA_DIR}/bin/run
 RUN chmod a+rx ${CONDA_DIR}/bin/run
 
 # Simple concatenation of fastq
-COPY concatenate_fastqs ${CONDA_DIR}/bin/
-RUN chmod a+rx ${CONDA_DIR}/bin/concatenate_fastqs
+# COPY concatenate_fastqs ${CONDA_DIR}/bin/
+# RUN chmod a+rx ${CONDA_DIR}/bin/concatenate_fastqs
 
 
 # Switch back to jovyan to avoid accidental container runs as root
