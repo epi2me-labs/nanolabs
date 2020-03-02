@@ -1,34 +1,22 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 stages:
-  - build_pico
-  - build_nano
+  - build
 
-
-.build_docker_image_generic: &build_docker_image_generic
-  image: git.oxfordnanolabs.local:4567/metrichor-bio/docker_test_images/docker_builder:master
-  tags:
-    - docker-builder
+build:docker:
+  image: docker-registry.oxfordnanolabs.local:5000/ont-dev-docker:x86
+  stage: build
+  before_script:
+    - apk add make bash openssl
   script:
-    - sh /build.sh
-  rules:
-    - if: "$RUN_ALL == 'TRUE'"
-      when: on_success
-    - changes:
-      - ${DOCKERFILE}
-
-
-build_picolabs_image:
-  variables:
-    DOCKERFILE: picolabs.docker
-    NAME: ${CI_PROJECT_PATH}/picolabs
-    VERSION: "something"
-  stage: build_pico
-  <<: *build_docker_image_generic
-
-
-build_nanolabs_image:
-  variables:
-    DOCKERFILE: nanolabs.docker
-    NAME: ${CI_PROJECT_PATH}/nanolabs
-    VERSION: "something"
-  stage: build_nano
-  <<: *build_docker_image_generic
+    - make base-notebook
+    - make minimal-notebook
+    - make picolabs-notebook
+    - make nanolabs-notebook
+    - REG=git.oxfordnanolabs.local:4567
+    - PUSH_IMAGE=nanolabs-notebook
+    - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+    - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
+    - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
+    - docker push ${TAG}

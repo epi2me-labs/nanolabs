@@ -12,19 +12,19 @@ endif
 
 
 OWNER := ontresearch
-BASEARGS     = --build-arg PYTHON_VERSION=3.6
-MINIMALARGS  = --build-arg BASE_CONTAINER=$(OWNER)/base-notebook
-PICOLABSARGS = --build-arg BASE_CONTAINER=$(OWNER)/minimal-notebook
-NANOLABSARGS = --build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook
+BASEARGS     =--build-arg PYTHON_VERSION=3.6
+MINIMALARGS  =--build-arg BASE_CONTAINER=$(OWNER)/base-notebook
+PICOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/minimal-notebook
+NANOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook
 
 
 base-notebook:
 > cd docker-stacks
-> make build/base-notebook OWNER=$(OWNER) DARGS=$(BASEARGS)
+> make build/base-notebook OWNER=$(OWNER) DARGS="$(BASEARGS)"
 
 minimal-notebook:
 > cd docker-stacks
-> make build/minimal-notebook OWNER=$(OWNER) DARGS=$(MINIMALARGS)
+> make build/minimal-notebook OWNER=$(OWNER) DARGS="$(MINIMALARGS)"
 
 picolabs-notebook:
 > docker build --rm --force-rm $(PICOLABSARGS) -t $(OWNER)/$@:latest -f picolabs.docker .
