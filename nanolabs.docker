@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 # Modified for and by Oxford Nanopore Technologies
-ARG BASE_CONTAINER=git.oxfordnanolabs.local:4567/custflow/nanolabs/picolabs:latest
+ARG BASE_CONTAINER=ontresearch/picolabs-notebook:latest
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Oxford Nanopore Technologies"
@@ -18,17 +18,13 @@ USER $NB_UID
 # Install additional modules into root, and programs into separate conda envs
 RUN \
     conda install --quiet --yes pyranges pysam && \
-    conda create --quiet --yes -n ont pomoxis medaka flye
+    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
 
-# Add run helper command for notebooks to run commands from conda envs
+# Add contents of bin to container PATH -- we might want a separate package
+# for these utilities.
 USER root
-COPY run_from_env ${CONDA_DIR}/bin/run
-RUN chmod a+rx ${CONDA_DIR}/bin/run
-
-# Simple concatenation of fastq
-# COPY concatenate_fastqs ${CONDA_DIR}/bin/
-# RUN chmod a+rx ${CONDA_DIR}/bin/concatenate_fastqs
-
+COPY bin/* ${CONDA_DIR}/bin/
+RUN chmod a+rx ${CONDA_DIR}/bin/* && fix-permissions ${CONDA_DIR}/bin/
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
