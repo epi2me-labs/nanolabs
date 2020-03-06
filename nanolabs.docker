@@ -9,16 +9,42 @@ LABEL maintainer="Oxford Nanopore Technologies"
 USER root
 
 RUN apt-get update \
- && apt-get install -yq --no-install-recommends \
-    vim tree \
- && apt-get clean && rm -rf /var/lib/apt/lists/*
+  && apt-get install -yq --no-install-recommends \
+     vim tree \
+     bzip2 zlib1g-dev libbz2-dev liblzma-dev libffi-dev libncurses5-dev \
+     libcurl4-gnutls-dev libssl-dev curl make cmake wget python3-all-dev \
+     python-virtualenv git-lfs \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
 
-# Install additional modules into root, and programs into separate conda envs
+# Install additional modules into root
 RUN \
-    conda install --quiet --yes pyranges pysam && \
-    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
+  conda install --quiet --yes \
+    'bedtools=2.29.2' \
+    'bcftools=1.10.2' \
+    'minimap2=2.17' \
+    'miniasm=0.3_r179' \
+    'pomoxis=0.3.2' \
+    'pyranges=0.0.76' \
+    'pysam=0.15.3' \
+    'racon=1.4.10' \
+    'rtg-tools=3.11' \
+    'samtools=1.10' \
+    'seqkit=0.12.0' \
+    'tabix=0.2.6' \
+  && conda clean --all -f -y \
+  && git lfs install \
+  && fix-permissions $CONDA_DIR \
+  && fix-permissions /home/$NB_USER
+
+# medaka has some specific reqs -> install into venv
+#    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
+RUN \
+  python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
+  && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
+  && pip install pip --upgrade \
+  && pip install medaka 
 
 # Add contents of bin to container PATH -- we might want a separate package
 # for these utilities.
