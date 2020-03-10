@@ -1,22 +1,57 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
+image: ${IMAGE}
 
 stages:
-  - build
+    - build
+    - push
 
 build:docker:
-  image: docker-registry.oxfordnanolabs.local:5000/ont-dev-docker:x86
-  stage: build
-  before_script:
-    - apk add make bash openssl
-  script:
-    - make base-notebook
-    - make minimal-notebook
-    - make picolabs-notebook
-    - make nanolabs-notebook
-    - REG=git.oxfordnanolabs.local:4567
-    - PUSH_IMAGE=nanolabs-notebook
-    - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
-    - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
-    - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
-    - docker push ${TAG}
+    stage: build
+    before_script:
+        - apk add make bash openssl
+    script:
+        - make base-notebook
+        - make minimal-notebook
+        - make picolabs-notebook
+        - make nanolabs-notebook
+
+push:internal:
+    stage: push
+    script:
+        - REG=git.oxfordnanolabs.local:4567
+        - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
+        - PUSH_IMAGE=nanolabs-notebook
+        - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+        - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
+        - docker push ${TAG}
+
+.push-dockerhub: &push-dockerhub
+    stage: push
+    script:
+        - echo ${DOCKERHUB_TOKEN} | docker login --username epi2melabs --password-stdin
+        - TAG=ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+        - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
+        - docker push ${TAG}
+    only:
+        - tags
+
+push:base:
+    before_script:
+        - PUSH_IMAGE=base-notebook
+    <<: *push-dockerhub
+
+push:minimal:
+    before_script:
+        - PUSH_IMAGE=minimal-notebook
+    <<: *push-dockerhub
+
+push:pico:
+    before_script:
+        - PUSH_IMAGE=nanolabs-notebook
+    <<: *push-dockerhub
+
+push:nano:
+    before_script:
+        - PUSH_IMAGE=picolabs-notebook
+    <<: *push-dockerhub
