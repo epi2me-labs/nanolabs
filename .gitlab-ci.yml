@@ -1,11 +1,11 @@
 variables:
-  GIT_SUBMODULE_STRATEGY: recursive
+      GIT_SUBMODULE_STRATEGY: recursive
+      PUSH_IMAGE: "nanolabs-notebook"
 image: ${IMAGE}
 
 stages:
     - build
     - push
-
 build:docker:
     stage: build
     before_script:
@@ -16,42 +16,39 @@ build:docker:
         - make picolabs-notebook
         - make nanolabs-notebook
 
-push:internal:
+.push-internal: &push-internal
     stage: push
-    script:
+    before_script:
         - REG=git.oxfordnanolabs.local:4567
         - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
-        - PUSH_IMAGE=nanolabs-notebook
+
+## Pushing commits on branches
+push-commit-internal:
+    <<: *push-internal
+    script:
         - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
         - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
         - docker push ${TAG}
+    except:
+        - tags
 
-.push-dockerhub: &push-dockerhub
-    stage: push
+## Pushing a tag internally
+push:tag-internal:
+    <<: *push-internal
     script:
-        - echo ${DOCKERHUB_TOKEN} | docker login --username epi2melabs --password-stdin
-        - TAG=ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+        - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_TAG}
         - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
         - docker push ${TAG}
     only:
         - tags
 
-push:base:
-    before_script:
-        - PUSH_IMAGE=base-notebook
-    <<: *push-dockerhub
-
-push:minimal:
-    before_script:
-        - PUSH_IMAGE=minimal-notebook
-    <<: *push-dockerhub
-
-push:pico:
-    before_script:
-        - PUSH_IMAGE=nanolabs-notebook
-    <<: *push-dockerhub
-
-push:nano:
-    before_script:
-        - PUSH_IMAGE=picolabs-notebook
-    <<: *push-dockerhub
+# Push tags to dockerhub
+push-dockerhub:
+    stage: push
+    script:
+        - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+        - echo ${DOCKERHUB_TOKEN} | docker login --username epi2melabs --password-stdin
+        - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
+        - docker push ${TAG}
+    only:
+        - tags
