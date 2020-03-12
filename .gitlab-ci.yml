@@ -46,7 +46,7 @@ push:tag-internal:
 push-dockerhub:
     stage: push
     script:
-        - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+        - TAG=ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
         - echo ${DOCKERHUB_TOKEN} | docker login --username epi2melabs --password-stdin
         - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
         - docker push ${TAG}
