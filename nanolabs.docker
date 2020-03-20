@@ -23,6 +23,7 @@ RUN \
   conda install --quiet --yes \
     'bedtools=2.29.2' \
     'bcftools=1.10.2' \
+    'flye=2.7' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
     'pomoxis=0.3.2' \
