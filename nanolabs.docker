@@ -30,7 +30,7 @@ RUN \
     'pyranges=0.0.76' \
     'pysam=0.15.3' \
     'racon=1.4.10' \
-    'rtg-tools=3.11' \
+    #'rtg-tools=3.11' \
     'samtools=1.10' \
     'seqkit=0.12.0' \
     'tabix=0.2.6' \
@@ -44,8 +44,8 @@ RUN \
 RUN \
   python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
-  && pip install pip --upgrade \
-  && pip install medaka 
+  && pip install --no-cache-dir --upgrade pip \
+  && pip install --no-cache-dir medaka 
 
 # Add contents of bin to container PATH -- we might want a separate package
 # for these utilities.

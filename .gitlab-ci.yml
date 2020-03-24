@@ -12,7 +12,6 @@ build:docker:
         - apk add make bash openssl
     script:
         - make base-notebook
-        - make minimal-notebook
         - make picolabs-notebook
         - make nanolabs-notebook
 

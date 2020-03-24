@@ -1,18 +1,39 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 # Modified for and by Oxford Nanopore Technologies
-ARG BASE_CONTAINER=jupyter/minimal-notebook
+ARG BASE_CONTAINER=jupyter/base-notebook
 FROM $BASE_CONTAINER
 
 LABEL maintainer="Oxford Nanopore Technologies"
 
 USER root
 
-# ffmpeg for matplotlib anim
-# everything next allows medaka htslib compile
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+    # ffmpeg for matplotlib anim
     ffmpeg \
+    # taken from minimal-notebook@9b983ea
+    build-essential \
+    #emacs \
+    git \
+    inkscape \
+    #jed \
+    libsm6 \
+    libxext-dev \
+    libxrender1 \
+    lmodern \
+    netcat \
+    python-dev \
+    # ---- nbconvert dependencies ----
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-generic-recommended \
+    # Optional dependency
+    #texlive-fonts-extra \
+    # ----
+    tzdata \
+    unzip \
+    #nano \
   && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
@@ -24,12 +45,12 @@ RUN \
     'bokeh=1.4.0' \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.5.*' \
-    'matplotlib-base=3.1.*' \
+    'conda-forge::matplotlib-base=3.2.*' \
     'pandas=0.25.*' \
     'protobuf=3.11.*' \
     'scikit-learn=0.22.*' \
     'scipy=1.4.*' \
-    'seaborn=0.9.*' \
+    'conda-forge::seaborn=0.9.*' \
     'xlrd=1.2.0' \
   && conda clean --all -f -y \
   && conda init bash \
@@ -45,7 +66,7 @@ RUN \
   # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
   && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.1 --no-build \
   ## colab extension
-  && pip install jupyter_http_over_ws \
+  && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh --no-build \
