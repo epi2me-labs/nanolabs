@@ -42,11 +42,11 @@ USER $NB_UID
 RUN \
   conda config --system --append channels bioconda \
   && conda install --quiet --yes \
-    'bokeh=1.4.0' \
+    'bokeh=2.0.0' \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.5.*' \
     'conda-forge::matplotlib-base=3.2.*' \
-    'pandas=0.25.*' \
+    'pandas=1.0.3' \
     'protobuf=3.11.*' \
     'scikit-learn=0.22.*' \
     'scipy=1.4.*' \
