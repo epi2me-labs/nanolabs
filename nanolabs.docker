@@ -39,6 +39,10 @@ RUN \
   && fix-permissions $CONDA_DIR \
   && fix-permissions /home/$NB_USER
 
+# our plotting library, not on conda
+RUN \
+  pip install --no-cache-dir aplanat==0.0.3
+
 # medaka has some specific reqs -> install into venv
 #    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
 RUN \
