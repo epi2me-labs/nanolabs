@@ -18,7 +18,7 @@ build:docker:
         - make nanolabs-notebook
         - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
         - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then 
-              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
+              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
               docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG};
               docker push ${TAG};
           fi
