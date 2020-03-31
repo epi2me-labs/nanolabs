@@ -5,7 +5,8 @@ image: ${IMAGE}
 
 stages:
     - build
-    - push
+    - pushtags
+    
 build:docker:
     stage: build
     before_script:
@@ -14,40 +15,38 @@ build:docker:
         - make base-notebook
         - make picolabs-notebook
         - make nanolabs-notebook
-
-.push-internal: &push-internal
-    stage: push
-    before_script:
-        - REG=git.oxfordnanolabs.local:4567
-        - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
-
-## Pushing commits on branches
-push-commit-internal:
-    <<: *push-internal
-    script:
         - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
-        - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
-        - docker push ${TAG}
-    except:
+        - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then 
+              docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG};
+              docker push ${TAG};
+          fi
+    only:
+        - branches
+
+.pushstub: &pull_tag
+    stage: pushtags
+    before_script:
+        - REG=${ONTREGISTRY}
+        - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
+        - ${CI_COMMIT_SHORT_SHA}
+        - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA}
+        - docker pull ${ORIG_TAG}
+    only:
         - tags
 
-## Pushing a tag internally
+# Push tag to ONT
 push:tag-internal:
-    <<: *push-internal
+    <<: *pull_tag
     script:
         - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_TAG}
-        - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
+        - docker tag ${ORIG_TAG} ${TAG}
         - docker push ${TAG}
-    only:
-        - tags
 
-# Push tags to dockerhub
-push-dockerhub:
-    stage: push
+# Push tag to dockerhub
+push:tag-dockerhub:
+    <<: *pull_tag
     script:
-        - TAG=ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
         - echo ${DOCKERHUB_TOKEN} | docker login --username epi2melabs --password-stdin
-        - docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG}
+        - TAG=ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+        - docker tag ${ORIG_TAG} ${TAG}
         - docker push ${TAG}
-    only:
-        - tags
