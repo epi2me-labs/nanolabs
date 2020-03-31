@@ -11,6 +11,7 @@ build:docker:
     stage: build
     before_script:
         - apk add make bash openssl
+        - REG=${ONTREGISTRY}
     script:
         - make base-notebook
         - make picolabs-notebook
