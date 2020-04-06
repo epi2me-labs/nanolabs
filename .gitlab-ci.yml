@@ -1,11 +1,27 @@
 variables:
       GIT_SUBMODULE_STRATEGY: recursive
       PUSH_IMAGE: "nanolabs-notebook"
+      GUPPY: ont-guppy-cpu_3.5.2_linux64.tar.gz
 image: ${IMAGE}
 
 stages:
+    - fetch
     - build
     - pushtags
+
+fetch:guppy:
+    stage: fetch
+    script:
+        # download guppy tar, remove basecalling models and programs
+        - wget --no-check-certificate ${GUPPYREPO}/${GUPPY}
+        - tar -xzvf ${GUPPY} && rm ${GUPPY}
+        - rm ont-guppy-cpu/data/*.jsn ont-guppy-cpu/bin/guppy_basecall*
+        - tar -czvf ${GUPPY} ont-guppy-cpu && rm -rf ont-guppy-cpu
+    only:
+        - branches
+    artifacts:
+        paths:
+            - ${GUPPY}
     
 build:docker:
     stage: build
@@ -13,6 +29,7 @@ build:docker:
         - apk add make bash openssl
         - REG=${ONTREGISTRY}
     script:
+        - tar -xzf ${GUPPY}
         - make base-notebook
         - make picolabs-notebook
         - make nanolabs-notebook

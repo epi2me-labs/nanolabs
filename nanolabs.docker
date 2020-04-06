@@ -51,6 +51,10 @@ RUN \
   && pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir medaka 
 
+# install guppy (minus the basecalling)
+COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
+ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
+
 # Add contents of bin to container PATH -- we might want a separate package
 # for these utilities.
 USER root

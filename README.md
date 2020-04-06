@@ -11,7 +11,7 @@ from the jupyter project: https://github.com/jupyter/docker-stacks.
 To build the container stack locally run:
 
 ```
-make base-notebook minimal-notebook picolabs-notebook nanolabs-notebook
+make base-notebook picolabs-notebook nanolabs-notebook
 ```
 
 The above targets build a stack of containers, the first two are from the
@@ -20,9 +20,9 @@ Jupyter stack
 * **base-notebook**:
 all OS dependencies for notebook server that starts but lacks all features
 * **minimal-notebook**:
-all OS dependencies for fully functional notebook server
+all OS dependencies for fully functional notebook server (not used as required parts in picolabs)
 * **picolabs-notebook**: 
-basic data science and plotting libraries
+all OS dependencies for fully functional notebook server and basic data science and plotting libraries
 * **nanolabs-notebook**:
 additional ONT and bioinformatics libraries
 
