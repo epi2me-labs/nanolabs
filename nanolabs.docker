@@ -41,7 +41,7 @@ RUN \
 
 # our plotting library, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.0.4
+  pip install --no-cache-dir aplanat==0.0.5
 
 # medaka has some specific reqs -> install into venv
 #    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
