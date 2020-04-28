@@ -53,7 +53,7 @@ ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.0.7 epi2melabs==0.0.1
+  pip install --no-cache-dir aplanat==0.0.7 epi2melabs==0.0.2
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
