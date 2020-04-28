@@ -39,10 +39,6 @@ RUN \
   && fix-permissions $CONDA_DIR \
   && fix-permissions /home/$NB_USER
 
-# our plotting library, not on conda
-RUN \
-  pip install --no-cache-dir aplanat==0.0.7
-
 # medaka has some specific reqs -> install into venv
 #    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
 RUN \
@@ -55,11 +51,9 @@ RUN \
 COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
 ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
 
-# Add contents of bin to container PATH -- we might want a separate package
-# for these utilities.
-USER root
-COPY bin/* ${CONDA_DIR}/bin/
-RUN chmod a+rx ${CONDA_DIR}/bin/* && fix-permissions ${CONDA_DIR}/bin/
+# our plotting and misc libraries, not on conda
+RUN \
+  pip install --no-cache-dir aplanat==0.0.7 epi2melabs==0.0.1
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
