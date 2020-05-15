@@ -13,16 +13,24 @@ RUN apt-get update \
      vim tree \
      bzip2 zlib1g-dev libbz2-dev liblzma-dev libffi-dev libncurses5-dev \
      libcurl4-gnutls-dev libssl-dev curl make cmake wget python3-all-dev \
-     python-virtualenv git-lfs \
+     python-virtualenv git-lfs r-base-dev libxml2-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# pavian takes an age
+COPY install_pavian.R /home/$NB_USER/install_pavian.R
+RUN \
+  Rscript /home/$NB_USER/install_pavian.R \
+  && rm -rf /home/$NB_USER/install_pavian.R
 
 USER $NB_UID
 
 # Install additional modules into root
 RUN \
   conda install --quiet --yes \
+    'blast=2.9.0' \
     'bedtools=2.29.2' \
     'bcftools=1.10.2' \
+    'centrifuge=1.0.4_beta' \
     'flye=2.7' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
@@ -45,15 +53,16 @@ RUN \
   python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
   && pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir medaka 
+  && pip install --no-cache-dir medaka==1.0.1
 
 # install guppy (minus the basecalling)
 COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
+COPY centrifuge-download /opt/conda/bin/centrifuge-download
 ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.0.7 epi2melabs==0.0.2
+  pip install --no-cache-dir aplanat==0.0.10 epi2melabs==0.0.3
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
