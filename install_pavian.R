@@ -1,5 +1,8 @@
 #!/usr/bin/Rscript
 
+ncpus=parallel::detectCores()
+options(Ncpus=ncpus)
+
 ### this installs but isn't picked up by pavian
 #source("https://bioconductor.org/biocLite.R")
 #biocLite("GenomicRanges")
