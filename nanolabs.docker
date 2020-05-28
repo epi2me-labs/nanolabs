@@ -63,7 +63,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.0.11 epi2melabs==0.0.3
+  pip install --no-cache-dir aplanat==0.0.11 epi2melabs==0.0.4
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
