@@ -34,7 +34,7 @@ RUN \
     'flye=2.7' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
-    'pomoxis=0.3.2' \
+    'pomoxis=0.3.4' \
     'pyranges=0.0.76' \
     'pysam=0.15.3' \
     'racon=1.4.10' \
@@ -53,7 +53,7 @@ RUN \
   python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
   && pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir medaka==1.0.1
+  && pip install --no-cache-dir medaka==1.0.3
 
 # install guppy (minus the basecalling)
 COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
@@ -63,7 +63,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.1.0 epi2melabs==0.0.4
+  pip install --no-cache-dir aplanat==0.1.2 epi2melabs==0.0.5
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
