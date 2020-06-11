@@ -34,6 +34,7 @@ RUN \
     'flye=2.7' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
+    'mosdepth=0.2.9' \
     'pomoxis=0.3.4' \
     'pyranges=0.0.76' \
     'pysam=0.15.3' \
@@ -41,6 +42,7 @@ RUN \
     #'rtg-tools=3.11' \
     'samtools=1.10' \
     'seqkit=0.12.0' \
+    'sniffles=1.0.11' \
     'tabix=0.2.6' \
   && conda clean --all -f -y \
   && git lfs install \
@@ -55,6 +57,15 @@ RUN \
   && pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir medaka==1.0.3
 
+# some tools to support sniffles SV calling
+RUN \
+  git clone https://github.com/nanoporetech/pipeline-structural-variation.git \
+  && python3 -m venv ${CONDA_DIR}/envs/venv_svtools --prompt "(svtools) " \
+  && . ${CONDA_DIR}/envs/venv_svtools/bin/activate \
+  && cd pipeline-structural-variation/lib \
+  && pip install --no-cache-dir . \
+  && cd .. && rm -rf pipeline-structural-variation
+
 # install guppy (minus the basecalling)
 COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
 ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
@@ -63,7 +74,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.1.2 epi2melabs==0.0.5
+  pip install --no-cache-dir aplanat==0.1.2 epi2melabs==0.0.6
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
