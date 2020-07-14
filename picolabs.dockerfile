@@ -66,6 +66,8 @@ RUN \
   # Check this URL for most recent compatibilities
   # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
   && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.1 --no-build \
+  ## table of contents, added for no colab option
+  && jupyter labextension install @jupyterlab/toc \ 
   ## colab extension
   && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
@@ -81,9 +83,9 @@ RUN \
   #&& jupyter labextension install plotlywidget@1.5.0 --no-build \
   #&& unset NODE_OPTIONS \
   ## github extension
-  # DISABLED: not needed in colab
-  #&& jupyter labextension install @jupyterlab/github --no-build \
-  #&& pip install jupyterlab_github \
+  # not needed in colab, added for nocolab option
+  && jupyter labextension install @jupyterlab/github --no-build \
+  && pip install jupyterlab_github \
   # build things
   && jupyter lab build \
   && npm cache clean --force \

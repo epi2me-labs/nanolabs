@@ -3,6 +3,7 @@
 # Modified for and by Oxford Nanopore Technologies
 ARG BASE_CONTAINER=ontresearch/picolabs-notebook:latest
 FROM $BASE_CONTAINER
+ARG DATE=unknown
 
 LABEL maintainer="Oxford Nanopore Technologies"
 
@@ -21,6 +22,12 @@ COPY install_pavian.R /home/$NB_USER/install_pavian.R
 RUN \
   Rscript /home/$NB_USER/install_pavian.R \
   && rm -rf /home/$NB_USER/install_pavian.R
+
+# for notebooks etc - see below
+ARG RESOURCE_DIR=/epi2me-resources
+RUN \
+  mkdir ${RESOURCE_DIR} \
+  && fix-permissions ${RESOURCE_DIR}
 
 USER $NB_UID
 
@@ -58,6 +65,7 @@ RUN \
   && pip install --no-cache-dir medaka==1.0.3
 
 # some tools to support sniffles SV calling
+# TODO: checkout a tag
 RUN \
   git clone https://github.com/nanoporetech/pipeline-structural-variation.git \
   && python3 -m venv ${CONDA_DIR}/envs/venv_svtools --prompt "(svtools) " \
@@ -75,6 +83,23 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 # our plotting and misc libraries, not on conda
 RUN \
   pip install --no-cache-dir aplanat==0.1.4 epi2melabs==0.0.7
+
+
+# TODO: checkout a tag? just force docker cache miss for now
+RUN CACHEMISS=${DATE} \
+  && for repo in resources tutorials; do \
+    git clone https://github.com/epi2me-labs/${repo}.git; \
+    mkdir ${RESOURCE_DIR}/${repo}; \
+    mv ${repo}/*.ipynb ${RESOURCE_DIR}/${repo}; \
+    for file in ${RESOURCE_DIR}/${repo}/*.ipynb; do \
+      echo ${file}; \
+      # preserve the colab breakout link; but move other links to internal
+      sed -i -E 's#[^"]https://colab.research.google.com/github/epi2me-labs/[^/]+/blob/master/#(#g' ${file}; \
+      # prevent users modifying canon
+      chmod a-w ${file}; \
+    done; \
+  done
+
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID

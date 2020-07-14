@@ -10,12 +10,13 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 endif
 .RECIPEPREFIX = >
 
+DATE=$(shell date +%s)
 
 OWNER := ontresearch
 BASEARGS     =--build-arg PYTHON_VERSION=3.6
 MINIMALARGS  =--build-arg BASE_CONTAINER=$(OWNER)/base-notebook
 PICOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/base-notebook
-NANOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook
+NANOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook --build-arg DATE=$(DATE)
 
 
 .PHONY: base-notebook
@@ -36,6 +37,9 @@ picolabs-notebook:
 nanolabs-notebook:
 > docker build --rm --force-rm $(NANOLABSARGS) -t $(OWNER)/$@:latest -f nanolabs.dockerfile .
 
+.PHONY: nocolab-notebook
+nocolab-notebook:
+> docker build --rm --force-rm $(NOCOLABARGS) -t $(OWNER)/$@:latest -f nanolabs-nocolab.dockerfile .
 
 datamount:=$(shell pwd)/labfolder
 token:=$(shell head /dev/random | openssl sha1)
