@@ -84,7 +84,7 @@ push:tag-dockerhub:
 push:dev-dockerhub:
     <<: *push_hub
     variables:
-        TAG: ontresearch/${PUSH_IMAGE}:latest
+        TAG: ontresearch/${PUSH_IMAGE}:dev
     only:
         - /^dev$/
     except:
