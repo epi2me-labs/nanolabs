@@ -30,11 +30,11 @@ minimal-notebook:
 
 .PHONY: picolabs-notebook
 picolabs-notebook:
-> docker build --rm --force-rm $(PICOLABSARGS) -t $(OWNER)/$@:latest -f picolabs.docker .
+> docker build --rm --force-rm $(PICOLABSARGS) -t $(OWNER)/$@:latest -f picolabs.dockerfile .
 
 .PHONY: nanolabs-notebook
 nanolabs-notebook:
-> docker build --rm --force-rm $(NANOLABSARGS) -t $(OWNER)/$@:latest -f nanolabs.docker .
+> docker build --rm --force-rm $(NANOLABSARGS) -t $(OWNER)/$@:latest -f nanolabs.dockerfile .
 
 
 datamount:=$(shell pwd)/labfolder

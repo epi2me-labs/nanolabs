@@ -7,7 +7,7 @@ image: ${IMAGE}
 stages:
     - fetch
     - build
-    - pushtags
+    - push
 
 fetch:guppy:
     stage: fetch
@@ -33,7 +33,7 @@ build:docker:
         - make base-notebook
         - make picolabs-notebook
         - make nanolabs-notebook
-        - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then 
+        - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
               echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
               TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA};
               echo "Pushing ${TAG}";
@@ -44,14 +44,12 @@ build:docker:
         - branches
 
 .pushstub: &pull_tag
-    stage: pushtags
+    stage: push
     before_script:
         - REG=${ONTREGISTRY}
         - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:dev-${CI_COMMIT_SHORT_SHA}
         - echo "Pulling ${ORIG_TAG}"
         - docker pull ${ORIG_TAG}
-    only:
-        - tags
 
 # Push tag to ONT
 push:tag-internal:
@@ -62,13 +60,32 @@ push:tag-internal:
         - echo "Pushing ${TAG}"
         - docker tag ${ORIG_TAG} ${TAG}
         - docker push ${TAG}
+    only:
+        - tags
 
-# Push tag to dockerhub
-push:tag-dockerhub:
+# Push to dockerhub
+.pushhubstub: &push_hub
     <<: *pull_tag
     script:
         - echo ${DOCKERHUB_TOKEN} | docker login --username epi2melabs --password-stdin
-        - TAG=ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
         - echo "Pushing ${TAG}"
         - docker tag ${ORIG_TAG} ${TAG}
         - docker push ${TAG}
+
+# Push tag to dockerhub
+push:tag-dockerhub:
+    <<: *push_hub
+    variables:
+        TAG: ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+    only:
+        - tags
+
+# Push dev commit to dockerhub
+push:dev-dockerhub:
+    <<: *push_hub
+    variables:
+        TAG: ontresearch/${PUSH_IMAGE}:latest
+    only:
+        - /^dev$/
+    except:
+        - tags
