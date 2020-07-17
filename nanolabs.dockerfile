@@ -48,7 +48,7 @@ RUN \
     'racon=1.4.10' \
     #'rtg-tools=3.11' \
     'samtools=1.10' \
-    'seqkit=0.12.0' \
+    'seqkit=0.13.2' \
     'sniffles=1.0.11' \
     'tabix=0.2.6' \
   && conda clean --all -f -y \
@@ -82,7 +82,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.1.4 epi2melabs==0.0.7
+  pip install --no-cache-dir aplanat==0.1.4 epi2melabs==0.0.8
 
 
 # TODO: checkout a tag? just force docker cache miss for now
