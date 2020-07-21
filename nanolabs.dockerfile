@@ -14,14 +14,8 @@ RUN apt-get update \
      vim tree \
      bzip2 zlib1g-dev libbz2-dev liblzma-dev libffi-dev libncurses5-dev \
      libcurl4-gnutls-dev libssl-dev curl make cmake wget python3-all-dev \
-     python-virtualenv git-lfs r-base-dev libxml2-dev \
+     python-virtualenv git-lfs libxml2-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# pavian takes an age
-COPY install_pavian.R /home/$NB_USER/install_pavian.R
-RUN \
-  Rscript /home/$NB_USER/install_pavian.R \
-  && rm -rf /home/$NB_USER/install_pavian.R
 
 # for notebooks etc - see below
 ARG RESOURCE_DIR=/epi2me-resources
@@ -33,7 +27,7 @@ USER $NB_UID
 
 # Install additional modules into root
 RUN \
-  conda install --quiet --yes \
+  mamba install --quiet --yes \
     'blast=2.9.0' \
     'bedtools=2.29.2' \
     'bcftools=1.10.2' \

@@ -3,6 +3,7 @@ pypi_build
 docs/_build/
 docs/epi2melabs.rst
 docs/modules.rst
+ont-guppy-cpu
 *.pyd
 *.pyc
 *.so

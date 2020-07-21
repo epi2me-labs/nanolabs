@@ -38,15 +38,17 @@ RUN apt-get update \
 
 USER $NB_UID
 
-# Install Python 3 packages
 RUN \
   conda config --system --append channels bioconda \
-  && conda install --quiet --yes \
+  && conda install mamba --quiet --yes \
+  && mamba install --quiet --yes \
     # bokeh 2.0.x breaks hexmaps
     'bokeh=1.4.0' \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.5.*' \
     'conda-forge::matplotlib-base=3.2.*' \
+    'conda-forge::r-base=4.0.2' \
+    'conda-forge::r-essentials' \
     'pandas=1.0.3' \
     'protobuf=3.11.*' \
     'scikit-learn=0.22.*' \
