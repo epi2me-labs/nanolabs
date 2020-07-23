@@ -82,16 +82,20 @@ RUN \
 # TODO: checkout a tag? just force docker cache miss for now
 RUN CACHEMISS=${DATE} \
   && for repo in resources tutorials; do \
-    git clone https://github.com/epi2me-labs/${repo}.git; \
+    git clone --depth 1 https://github.com/epi2me-labs/${repo}.git; \
     mkdir ${RESOURCE_DIR}/${repo}; \
-    mv ${repo}/*.ipynb ${RESOURCE_DIR}/${repo}; \
+    cp ${repo}/*.ipynb ${RESOURCE_DIR}/${repo}; \
     for file in ${RESOURCE_DIR}/${repo}/*.ipynb; do \
       echo ${file}; \
-      # preserve the colab breakout link; but move other links to internal
-      sed -i -E 's#[^"]https://colab.research.google.com/github/epi2me-labs/[^/]+/blob/master/#(#g' ${file}; \
+      # preserve the colab breakout link; but move other links
+      # the breakout link has href=\"...
+      # others are markdown with ](...
+      # capture repo from colab link and create relative link
+      sed -i -E 's#[^"]https://colab.research.google.com/github/epi2me-labs/([^/]+)/blob/master/#(../\1/#g' ${file}; \
       # prevent users modifying canon
       chmod a-w ${file}; \
     done; \
+    rm -rf ${repo}; \
   done
 
 
