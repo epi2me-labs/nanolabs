@@ -1,9 +1,8 @@
-
 # Nanolabs container stack
 
 This project builds a docker container capable of running a Jupyter notebook
 server with bioinformatics tools preconfigured. It leverages the stack
-from the jupyter project: https://github.com/jupyter/docker-stacks.
+from the jupyter project: https://github.com/jupyter/docker-stacks. 
 
 
 ## Building notebook server
