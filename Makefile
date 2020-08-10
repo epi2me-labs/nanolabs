@@ -10,6 +10,12 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 endif
 .RECIPEPREFIX = >
 
+ifeq ($(OS), Darwin)
+	SEDI=sed -i '.bak'
+else
+	SEDI=sed -i
+endif
+
 DATE=$(shell date +%s)
 
 OWNER := ontresearch
@@ -18,10 +24,17 @@ MINIMALARGS  =--build-arg BASE_CONTAINER=$(OWNER)/base-notebook
 PICOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/base-notebook
 NANOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook --build-arg DATE=$(DATE)
 
+MINICONDA_VERSION=4.8.3
+MINICONDA_MD5=d63adf39f2c220950a063e0529d4ff74
+CONDA_VERSION=4.8.3
 
 .PHONY: base-notebook
 base-notebook:
 > cd docker-stacks
+> $(SEDI) "s/^\(ENV MINICONDA_VERSION=\)\([^ ]*\)/\1"$(MINICONDA_VERSION)"/" base-notebook/Dockerfile
+> $(SEDI) "s/^\(    MINICONDA_MD5=\)\([^ ]*\)/\1"$(MINICONDA_MD5)"/" base-notebook/Dockerfile
+> $(SEDI) "s/^\(    CONDA_VERSION=\)\([^ ]*\)/\1"$(CONDA_VERSION)"/" base-notebook/Dockerfile
+> $(SEDI) 's/Miniconda3-$${MINICONDA_VERSION}-Linux-x86_64.sh/Miniconda3-py38_$${MINICONDA_VERSION}-Linux-x86_64.sh/' base-notebook/Dockerfile
 > make build/base-notebook OWNER=$(OWNER) DARGS="$(BASEARGS)"
 
 .PHONY: minimal-notebook
