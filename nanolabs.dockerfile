@@ -80,7 +80,10 @@ RUN \
 
 
 # TODO: checkout a tag? just force docker cache miss for now
+USER $NB_UID
 RUN CACHEMISS=${DATE} \
+  && jupyter trust --reset \
+  && cd /home/$NB_USER \
   && for repo in resources tutorials; do \
     git clone --depth 1 https://github.com/epi2me-labs/${repo}.git; \
     mkdir ${RESOURCE_DIR}/${repo}; \
@@ -92,6 +95,8 @@ RUN CACHEMISS=${DATE} \
       # others are markdown with ](...
       # capture repo from colab link and create relative link
       sed -i -E 's#[^"]https://colab.research.google.com/github/epi2me-labs/([^/]+)/blob/master/#(../\1/#g' ${file}; \
+      # we need to trust the file for e.g. bokeh plots to show
+      jupyter trust ${file}; \
       # prevent users modifying canon
       chmod a-w ${file}; \
     done; \
