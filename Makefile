@@ -10,9 +10,11 @@ ifeq ($(origin .RECIPEPREFIX), undefined)
 endif
 .RECIPEPREFIX = >
 
+OS := $(shell uname)
 ifeq ($(OS), Darwin)
 	SEDI=sed -i '.bak'
 else
+	echo $(OS)
 	SEDI=sed -i
 endif
 
@@ -32,9 +34,9 @@ JUPYTERLAB_VERSION=2.1.2
 .PHONY: base-notebook
 base-notebook:
 > cd docker-stacks
-> $(SEDI) "s/^\(ENV MINICONDA_VERSION=\)\([^ ]*\)/\1"$(MINICONDA_VERSION)"/" base-notebook/Dockerfile
-> $(SEDI) "s/^\(    MINICONDA_MD5=\)\([^ ]*\)/\1"$(MINICONDA_MD5)"/" base-notebook/Dockerfile
-> $(SEDI) "s/^\(    CONDA_VERSION=\)\([^ ]*\)/\1"$(CONDA_VERSION)"/" base-notebook/Dockerfile
+> $(SEDI) "s/^\(ENV MINICONDA_VERSION=\)\([^ ]*\)/\1$(MINICONDA_VERSION)/" base-notebook/Dockerfile
+> $(SEDI) "s/^\(    MINICONDA_MD5=\)\([^ ]*\)/\1$(MINICONDA_MD5)/" base-notebook/Dockerfile
+> $(SEDI) "s/^\(    CONDA_VERSION=\)\([^ ]*\)/\1$(CONDA_VERSION)/" base-notebook/Dockerfile
 > $(SEDI) 's/Miniconda3-$${MINICONDA_VERSION}-Linux-x86_64.sh/Miniconda3-py38_$${MINICONDA_VERSION}-Linux-x86_64.sh/' base-notebook/Dockerfile
 > $(SEDI) "s/jupyterlab=[^']*/jupyterlab=$(JUPYTERLAB_VERSION)/" base-notebook/Dockerfile
 > make build/base-notebook OWNER=$(OWNER) DARGS="$(BASEARGS)"
