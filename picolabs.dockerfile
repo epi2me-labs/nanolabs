@@ -69,14 +69,14 @@ RUN \
   ## Also activate ipywidgets extension for JupyterLab
   # Check this URL for most recent compatibilities
   # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-  && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.1 --no-build \
+  && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2 --no-build \
   ## table of contents, added for no colab option
-  && jupyter labextension install @jupyterlab/toc \ 
+  && jupyter labextension install @jupyterlab/toc --no-build \ 
   ## colab extension
   && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
   ## bokeh
-  && jupyter labextension install @bokeh/jupyter_bokeh --no-build \
+  && jupyter labextension install @bokeh/jupyter_bokeh@^2.0.0 --no-build \
   ## interactive matplotlib graphs
   # DISABLED - doesn't work in colab, to enabled add back 'ipympl=0.5.0' to conda install
   #&& jupyter labextension install jupyter-matplotlib --no-build \
