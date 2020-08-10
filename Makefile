@@ -11,10 +11,10 @@ endif
 .RECIPEPREFIX = >
 
 OS := $(shell uname)
+
 ifeq ($(OS), Darwin)
 	SEDI=sed -i '.bak'
 else
-	echo $(OS)
 	SEDI=sed -i
 endif
 
