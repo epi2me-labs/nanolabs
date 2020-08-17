@@ -42,8 +42,7 @@ RUN \
   conda config --system --append channels bioconda \
   && conda install mamba --quiet --yes \
   && mamba install --quiet --yes \
-    # bokeh 2.0.x breaks hexmaps
-    'bokeh=1.4.0' \
+    'bokeh=2.1.*' \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.5.*' \
     'conda-forge::matplotlib-base=3.2.*' \
