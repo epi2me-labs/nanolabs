@@ -49,12 +49,14 @@ RUN \
     'conda-forge::matplotlib-base=3.2.*' \
     'conda-forge::r-base=4.0.2' \
     'conda-forge::r-essentials' \
+    'parallel' \
     'pandas=1.0.3' \
     'protobuf=3.11.*' \
     'scikit-learn=0.22.*' \
     'scipy=1.4.*' \
     'conda-forge::seaborn=0.9.*' \
     'xlrd=1.2.0' \
+  && mkdir ~/.parallel && touch ~/.parallel/will-cite \
   && conda clean --all -f -y \
   && conda init bash \
   && fix-permissions $CONDA_DIR \
