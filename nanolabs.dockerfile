@@ -40,7 +40,7 @@ RUN \
     'pyranges=0.0.76' \
     'pysam=0.15.3' \
     'racon=1.4.10' \
-    #'rtg-tools=3.11' \
+    ##'rtg-tools=3.11' \
     'samtools=1.10' \
     'seqkit=0.13.2' \
     'sniffles=1.0.11' \
@@ -59,7 +59,7 @@ RUN \
   && pip install --no-cache-dir medaka==1.0.3
 
 # some tools to support sniffles SV calling
-# TODO: checkout a tag
+## TODO: checkout a tag
 RUN \
   git clone https://github.com/nanoporetech/pipeline-structural-variation.git \
   && python3 -m venv ${CONDA_DIR}/envs/venv_svtools --prompt "(svtools) " \

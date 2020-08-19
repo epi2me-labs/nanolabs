@@ -1,5 +1,9 @@
 variables:
+      OWNER: ontresearch
       GIT_SUBMODULE_STRATEGY: recursive
+      BASE: "base"
+      PICO: "picolabs"
+      NANO: "nanolabs"
       PUSH_IMAGE: "nanolabs-notebook"
       GUPPY: ont-guppy-cpu_3.5.2_linux64.tar.gz
 image: ${IMAGE}
@@ -22,17 +26,10 @@ fetch:guppy:
     artifacts:
         paths:
             - ${GUPPY}
-    
-build:docker:
-    stage: build
-    before_script:
-        - apk add make bash git openssl
-        - REG=${ONTREGISTRY}
-    script:
-        - tar -xzf ${GUPPY}
-        - make base-notebook
-        - make picolabs-notebook
-        - make nanolabs-notebook
+
+.build:docker-after: &build-docker-after
+    # push image with tag dev-<commit_sha>
+    after_script:
         - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
               echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
               TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA};
@@ -40,6 +37,66 @@ build:docker:
               docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG};
               docker push ${TAG};
           fi;
+
+build:docker-manual:
+    stage: build
+    when: manual
+    before_script:
+        - apk add make bash git openssl
+        - REG=${ONTREGISTRY}
+        - REF=${CI_COMMIT_REF_NAME}
+    script:
+        - tar -xzf ${GUPPY}
+        - make base-notebook
+        - make picolabs-notebook
+        - make nanolabs-notebook
+        - IMAGE=${NANO}-notebook
+    <<: *build-docker-after
+
+
+build:docker:
+    stage: build
+    before_script:
+        - apk add make bash openssl git
+        - REG=${ONTREGISTRY}
+        - REF=${CI_COMMIT_REF_NAME}
+    script:
+        - tar -xzf ${GUPPY}
+        - >
+          REBUILD_DOWNSTREAM=false;
+          for CURRENT in $BASE $PICO $NANO;
+          do
+            IMAGE=${CURRENT}-notebook
+            DOCKERFILE=${CURRENT}.dockerfile
+            TAG=${REG}/${CI_PROJECT_PATH}/${IMAGE}:${REF};
+
+            echo "Attempting to pull ${TAG}"
+            echo `docker pull ${TAG}`
+
+            if $REBUILD_DOWNSTREAM ; then
+              echo "Parent image changed, rebuilding"
+              make $IMAGE
+            elif [[ "$(docker images -q ${TAG} 2> /dev/null)" == "" ]]; then
+              echo "${IMAGE} not yet built for ref ${REF}, building"
+              make $IMAGE
+              REBUILD_DOWNSTREAM=true
+            elif [[ -f $DOCKERFILE ]] && [[ ! "$(git diff HEAD~ $DOCKERFILE)" == "" ]]; then
+              echo "Changes have been made to ${IMAGE}'s dockerfile, rebuilding"
+              make $IMAGE
+              REBUILD_DOWNSTREAM=true
+            else
+              docker tag $TAG $OWNER/$IMAGE:latest
+            fi
+
+            if $REBUILD_DOWNSTREAM ; then
+              echo "Logging in to internal gitlab container registry"
+              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
+              echo "Pushing ${TAG}";
+              docker tag $OWNER/$IMAGE:latest ${TAG};
+              docker push ${TAG};
+            fi;
+          done;
+    <<: *build-docker-after
     only:
         - branches
 
@@ -47,7 +104,7 @@ build:docker:
     stage: push
     before_script:
         - REG=${ONTREGISTRY}
-        - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:dev-${CI_COMMIT_SHORT_SHA}
+        - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_REF_NAME}
         - echo "Pulling ${ORIG_TAG}"
         - docker pull ${ORIG_TAG}
 
