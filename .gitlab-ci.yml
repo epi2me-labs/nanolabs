@@ -28,7 +28,7 @@ fetch:guppy:
             - ${GUPPY}
 
 .build:docker-after: &build-docker-after
-    # push image with tag dev-<commit_sha>
+    # on dev branch, push image with tag dev-<commit_sha>
     after_script:
         - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
               echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
@@ -100,11 +100,13 @@ build:docker:
     only:
         - branches
 
+
 .pushstub: &pull_tag
     stage: push
     before_script:
+        # pull image from registry that was built previously on merge to dev
         - REG=${ONTREGISTRY}
-        - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_REF_NAME}
+        - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:dev-${CI_COMMIT_SHORT_SHA}
         - echo "Pulling ${ORIG_TAG}"
         - docker pull ${ORIG_TAG}
 
