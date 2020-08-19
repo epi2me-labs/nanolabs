@@ -26,7 +26,7 @@ fetch:guppy:
 build:docker:
     stage: build
     before_script:
-        - apk add make bash openssl
+        - apk add make bash git openssl
         - REG=${ONTREGISTRY}
     script:
         - tar -xzf ${GUPPY}
