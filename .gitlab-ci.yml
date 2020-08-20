@@ -13,52 +13,44 @@ stages:
     - build
     - push
 
+# fetch guppy, unpack, keep only ancilliary programs (barcoding)
 fetch:guppy:
     stage: fetch
+    only:
+        - branches
     script:
         # download guppy tar, remove basecalling models and programs
         - wget --no-check-certificate ${GUPPYREPO}/${GUPPY}
         - tar -xzvf ${GUPPY} && rm ${GUPPY}
         - rm ont-guppy-cpu/data/*.jsn ont-guppy-cpu/bin/guppy_basecall*
         - tar -czvf ${GUPPY} ont-guppy-cpu && rm -rf ont-guppy-cpu
-    only:
-        - branches
     artifacts:
         paths:
             - ${GUPPY}
 
+# on dev branch, push image with tag dev-<commit_sha>
+#   - used below in manual and main job
+#   - images from dev commits also go to dockerhub via
+#     the push:dev-dockerhub job
 .build:docker-after: &build-docker-after
-    # on dev branch, push image with tag dev-<commit_sha>
     after_script:
         - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
-              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
-              TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA};
+              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${ONTREGISTRY};
+              TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA};
               echo "Pushing ${TAG}";
               docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG};
               docker push ${TAG};
           fi;
 
-build:docker-manual:
-    stage: build
-    when: manual
-    before_script:
-        - apk add make bash git openssl
-        - REG=${ONTREGISTRY}
-        - REF=${CI_COMMIT_REF_NAME}
-    script:
-        - tar -xzf ${GUPPY}
-        - make base-notebook
-        - make picolabs-notebook
-        - make nanolabs-notebook
-        - IMAGE=${NANO}-notebook
-    <<: *build-docker-after
-
-
+# The main job. First time on a branch all images will be built,
+# subsequent build will try to reuse intermediate images if nothing
+# has changed in the associated dockerfile.
 build:docker:
     stage: build
+    only:
+        - branches
     before_script:
-        - apk add make bash openssl git
-        - REG=${ONTREGISTRY}
+        - apk add make bash git openssl
         - REF=${CI_COMMIT_REF_NAME}
     script:
         - tar -xzf ${GUPPY}
@@ -68,7 +60,7 @@ build:docker:
           do
             IMAGE=${CURRENT}-notebook
             DOCKERFILE=${CURRENT}.dockerfile
-            TAG=${REG}/${CI_PROJECT_PATH}/${IMAGE}:${REF};
+            TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${IMAGE}:${REF};
 
             echo "Attempting to pull ${TAG}"
             echo `docker pull ${TAG}`
@@ -90,39 +82,41 @@ build:docker:
 
             if $REBUILD_DOWNSTREAM ; then
               echo "Logging in to internal gitlab container registry"
-              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG};
+              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${ONTREGISTRY};
               echo "Pushing ${TAG}";
               docker tag $OWNER/$IMAGE:latest ${TAG};
               docker push ${TAG};
             fi;
           done;
+    # if dev branch, push a tag "dev-<commit_sha>",
+    # see also push:dev-dockerhub:
     <<: *build-docker-after
-    only:
-        - branches
+
+# manual build doing all images from scratch
+build:docker-manual:
+    stage: build
+    when: manual
+    before_script:
+        - apk add make bash git openssl
+    script:
+        - tar -xzf ${GUPPY}
+        - make base-notebook
+        - make picolabs-notebook
+        - make nanolabs-notebook
+    # if dev branch, push a tag "dev-<commit_sha>",
+    # see also push:dev-dockerhub:
+    <<: *build-docker-after
 
 
+# pull dev-<commit_sha> image tag from internal registry
 .pushstub: &pull_tag
     stage: push
     before_script:
-        # pull image from registry that was built previously on merge to dev
-        - REG=${ONTREGISTRY}
-        - ORIG_TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:dev-${CI_COMMIT_SHORT_SHA}
+        - ORIG_TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:dev-${CI_COMMIT_SHORT_SHA}
         - echo "Pulling ${ORIG_TAG}"
         - docker pull ${ORIG_TAG}
 
-# Push tag to ONT
-push:tag-internal:
-    <<: *pull_tag
-    script:
-        - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${REG}
-        - TAG=${REG}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_TAG}
-        - echo "Pushing ${TAG}"
-        - docker tag ${ORIG_TAG} ${TAG}
-        - docker push ${TAG}
-    only:
-        - tags
-
-# Push to dockerhub
+# push to dockerhub, requires target image ${TAG}
 .pushhubstub: &push_hub
     <<: *pull_tag
     script:
@@ -131,20 +125,32 @@ push:tag-internal:
         - docker tag ${ORIG_TAG} ${TAG}
         - docker push ${TAG}
 
-# Push tag to dockerhub
-push:tag-dockerhub:
-    <<: *push_hub
-    variables:
-        TAG: ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+# Push tag to ONT, requires target image ${TAG}
+push:tag-internal:
     only:
         - tags
+    <<: *pull_tag
+    script:
+        - echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${ONTREGISTRY}
+        - TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+        - echo "Pushing ${TAG}"
+        - docker tag ${ORIG_TAG} ${TAG}
+        - docker push ${TAG}
+
+# Push git tags to dockerhub
+push:tag-dockerhub:
+    only:
+        - tags
+    variables:
+        TAG: ontresearch/${PUSH_IMAGE}:${CI_COMMIT_TAG}
+    <<: *push_hub
 
 # Push dev commit to dockerhub
 push:dev-dockerhub:
-    <<: *push_hub
-    variables:
-        TAG: ontresearch/${PUSH_IMAGE}:dev
     only:
         - /^dev$/
     except:
         - tags
+    variables:
+        TAG: ontresearch/${PUSH_IMAGE}:dev
+    <<: *push_hub
