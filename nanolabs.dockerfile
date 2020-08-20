@@ -76,7 +76,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.1.5 epi2melabs==0.0.9
+  pip install --no-cache-dir aplanat==0.1.5 epi2melabs==0.0.10
 
 
 # TODO: checkout a tag? just force docker cache miss for now
