@@ -102,6 +102,16 @@ RUN CACHEMISS=${DATE} \
     done; \
     rm -rf ${repo}; \
   done
+  # need to fix permissions here but done below as root
+
+# copy script for injecting user permissions
+ENV NB_HOST_USER=nbhost
+USER root
+COPY run_as_user.sh /usr/local/bin/
+RUN \
+  echo "${NB_USER} ALL=(root) NOPASSWD: /usr/sbin/useradd" > /etc/sudoers.d/${NB_USER} \
+  && echo "${NB_USER} ALL=(${NB_HOST_USER}) NOPASSWD:SETENV: /usr/local/bin/start-notebook.sh" >> /etc/sudoers.d/${NB_USER} \
+  && fix-permissions ${HOME}
 
 
 # Switch back to jovyan to avoid accidental container runs as root
