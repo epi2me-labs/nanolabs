@@ -11,7 +11,7 @@ USER root
 
 RUN apt-get update \
   && apt-get install -yq --no-install-recommends \
-     vim column tree \
+     vim bsdmainutils tree \
      bzip2 zlib1g-dev libbz2-dev liblzma-dev libffi-dev libncurses5-dev \
      libcurl4-gnutls-dev libssl-dev curl make cmake wget python3-all-dev \
      python-virtualenv git-lfs libxml2-dev \
