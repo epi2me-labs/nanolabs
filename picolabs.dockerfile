@@ -28,13 +28,11 @@ RUN apt-get update \
     texlive-xetex \
     texlive-fonts-recommended \
     texlive-generic-recommended \
-    # Optional dependency
-    #texlive-fonts-extra \
     # ----
     tzdata \
     unzip \
     #nano \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
 
@@ -43,23 +41,25 @@ RUN \
   && conda install mamba --quiet --yes \
   && mamba install --quiet --yes \
     'bokeh=2.1.*' \
+    'jupyter_bokeh' \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.5.*' \
-    'conda-forge::matplotlib-base=3.2.*' \
+    'matplotlib-base=3.2.*' \
     'conda-forge::r-base=4.0.2' \
     'conda-forge::r-essentials' \
     'parallel' \
-    'pandas=1.0.3' \
-    'protobuf=3.11.*' \
-    'scikit-learn=0.22.*' \
-    'scipy=1.4.*' \
-    'conda-forge::seaborn=0.9.*' \
+    'pandas=1.1.*' \
+    'protobuf=3.12.*' \
+    'scikit-learn=0.23.*' \
+    'scipy=1.5.*' \
+    'seaborn=0.10.*' \
+    'widgetsnbextension=3.5.*' \
     'xlrd=1.2.0' \
   && mkdir ~/.parallel && touch ~/.parallel/will-cite \
   && conda clean --all -f -y \
   && conda init bash \
-  && fix-permissions $CONDA_DIR \
-  && fix-permissions /home/$NB_USER
+  && fix-permissions "${CONDA_DIR}" \
+  && fix-permissions "/home/${NB_USER}"
 
 # jupyter extensions
 RUN \
@@ -68,7 +68,7 @@ RUN \
   ## Also activate ipywidgets extension for JupyterLab
   # Check this URL for most recent compatibilities
   # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-  && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2 --no-build \
+  && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build \
   ## table of contents, added for no colab option
   && jupyter labextension install @jupyterlab/toc --no-build \ 
   ## colab extension
@@ -90,19 +90,20 @@ RUN \
   && jupyter labextension install @jupyterlab/github --no-build \
   && pip install jupyterlab_github \
   # build things
-  && jupyter lab build \
+  && jupyter lab build -y \
+  && jupyter lab clean -y \
   && npm cache clean --force \
-  && rm -rf $CONDA_DIR/share/jupyter/lab/staging \
-  && rm -rf /home/$NB_USER/.cache/yarn \
-  && rm -rf /home/$NB_USER/.node-gyp \
-  && fix-permissions $CONDA_DIR \
-  && fix-permissions /home/$NB_USER
+  && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
+  && rm -rf "/home/${NB_USER}/.cache/yarn" \
+  && rm -rf "/home/${NB_USER}/.node-gyp" \
+  && fix-permissions "${CONDA_DIR}" \
+  && fix-permissions "/home/${NB_USER}"
 
 # Import matplotlib the first time to build the font cache.
-ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
+ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"
 RUN \
   MPLBACKEND=Agg python -c "import matplotlib.pyplot" \
-  && fix-permissions /home/$NB_USER
+  && fix-permissions "/home/${NB_USER}"
 
 USER $NB_UID
 
