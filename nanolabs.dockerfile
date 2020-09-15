@@ -111,7 +111,9 @@ ENV NB_HOST_USER=nbhost
 USER root
 COPY run_as_user.sh /usr/local/bin/
 RUN \
+  # allow notebook user to add new users, see run_as_user.sh
   echo "${NB_USER} ALL=(root) NOPASSWD: /usr/sbin/useradd" > /etc/sudoers.d/${NB_USER} \
+  # and allow notebook user to run notebook as NB_HOST_USER
   && echo "${NB_USER} ALL=(${NB_HOST_USER}) NOPASSWD:SETENV: /usr/local/bin/start-notebook.sh" >> /etc/sudoers.d/${NB_USER} \
   && fix-permissions ${HOME}
 
