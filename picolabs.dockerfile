@@ -75,7 +75,7 @@ RUN \
   && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
   ## bokeh
-  && jupyter labextension install @bokeh/jupyter_bokeh@^2.0.0 --no-build \
+  && jupyter labextension install @bokeh/jupyter_bokeh@2.0.3 --no-build \
   ## interactive matplotlib graphs
   # DISABLED - doesn't work in colab, to enabled add back 'ipympl=0.5.0' to conda install
   #&& jupyter labextension install jupyter-matplotlib --no-build \
