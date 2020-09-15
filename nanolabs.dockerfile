@@ -51,17 +51,17 @@ RUN \
   && fix-permissions /home/$NB_USER
 
 # medaka has some specific reqs -> install into venv
-#    conda create --quiet --yes -n ont medaka==0.11.5 pomoxis==0.3.2
+ARG MEDAKA_VERSION=1.0.3
 RUN \
   python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
   && pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir medaka==1.0.3
+  && pip install --no-cache-dir medaka==${MEDAKA_VERSION}
 
 # some tools to support sniffles SV calling
-## TODO: checkout a tag
+ARG SV_PIPELINE_TAG=v1.6.1
 RUN \
-  git clone https://github.com/nanoporetech/pipeline-structural-variation.git \
+  git clone --depth 1 --branch ${SV_PIPELINE_TAG} https://github.com/nanoporetech/pipeline-structural-variation.git \
   && python3 -m venv ${CONDA_DIR}/envs/venv_svtools --prompt "(svtools) " \
   && . ${CONDA_DIR}/envs/venv_svtools/bin/activate \
   && cd pipeline-structural-variation/lib \
@@ -71,6 +71,7 @@ RUN \
 # install guppy (minus the basecalling)
 COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
 ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
+
 # replace centrifuge download with one that just does http with wget (not ftp)
 COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
@@ -78,7 +79,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 RUN \
   pip install --no-cache-dir aplanat==0.1.5 epi2melabs==0.0.11
 
-
+# notebooks - installed to ${RESOURCE_DIR}
 # TODO: checkout a tag? just force docker cache miss for now
 USER $NB_UID
 RUN CACHEMISS=${DATE} \
@@ -103,6 +104,7 @@ RUN CACHEMISS=${DATE} \
     rm -rf ${repo}; \
   done
   # need to fix permissions here but done below as root
+  #    --- erm, this doesn't seem to be done?
 
 # copy script for injecting user permissions
 ENV NB_HOST_USER=nbhost
@@ -112,7 +114,6 @@ RUN \
   echo "${NB_USER} ALL=(root) NOPASSWD: /usr/sbin/useradd" > /etc/sudoers.d/${NB_USER} \
   && echo "${NB_USER} ALL=(${NB_HOST_USER}) NOPASSWD:SETENV: /usr/local/bin/start-notebook.sh" >> /etc/sudoers.d/${NB_USER} \
   && fix-permissions ${HOME}
-
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
