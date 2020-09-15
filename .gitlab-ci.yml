@@ -56,6 +56,13 @@ build:docker:
         - tar -xzf ${GUPPY}
         - >
           REBUILD_DOWNSTREAM=false;
+          if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
+            echo "=================================================="
+            echo "Rebuilding all from scratch because branch is: dev"
+            echo "=================================================="
+            REBUILD_DOWNSTREAM=true;
+          fi
+          
           for CURRENT in $BASE $PICO $NANO;
           do
             IMAGE=${CURRENT}-notebook
