@@ -30,7 +30,7 @@ index 020cd41..f91e34b 100644
      'notebook=6.0.3' \
      'jupyterhub=1.1.0' \
 -    'jupyterlab=1.2.5' && \
-+    'jupyterlab=2.1.2' && \
++    'jupyterlab=2.2.8' && \
      conda clean --all -f -y && \
      npm cache clean --force && \
      jupyter notebook --generate-config && \

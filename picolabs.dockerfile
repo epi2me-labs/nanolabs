@@ -70,7 +70,9 @@ RUN \
   # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
   && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build \
   ## table of contents, added for no colab option
-  && jupyter labextension install @jupyterlab/toc --no-build \ 
+  && jupyter labextension install @jupyterlab/toc --no-build \
+  && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells \
+  && jupyter labextension install @aquirdturtle/collapsible_headings \
   ## colab extension
   && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
