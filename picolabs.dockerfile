@@ -73,6 +73,7 @@ RUN \
   && jupyter labextension install @jupyterlab/toc --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells \
   && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button \
+  && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser \
   && jupyter labextension install @aquirdturtle/collapsible_headings \
   ## colab extension
   && pip install --no-cache-dir jupyter_http_over_ws \
