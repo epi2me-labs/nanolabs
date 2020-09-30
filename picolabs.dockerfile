@@ -71,10 +71,10 @@ RUN \
   && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build \
   ## table of contents, added for no colab option
   && jupyter labextension install @jupyterlab/toc --no-build \
-  && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells \
-  && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button \
-  && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser \
-  && jupyter labextension install @aquirdturtle/collapsible_headings \
+  && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells --no-build \
+  && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
+  && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
+  && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## colab extension
   && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
