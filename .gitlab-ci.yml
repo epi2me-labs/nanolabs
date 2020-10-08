@@ -56,11 +56,13 @@ build:docker:
         - tar -xzf ${GUPPY}
         - >
           REBUILD_DOWNSTREAM=false;
+          ATTEMPT_PULL=true;
           if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
             echo "=================================================="
             echo "Rebuilding all from scratch because branch is: dev"
             echo "=================================================="
             REBUILD_DOWNSTREAM=true;
+            ATTEMPT_PULL=false;
           fi
           
           for CURRENT in $BASE $PICO $NANO;
@@ -69,8 +71,10 @@ build:docker:
             DOCKERFILE=${CURRENT}.dockerfile
             TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${IMAGE}:${REF};
 
-            echo "Attempting to pull ${TAG}"
-            echo `docker pull ${TAG}`
+            if $ATTEMPT_PULL ; then
+              echo "Attempting to pull ${TAG}"
+              echo `docker pull ${TAG}`
+            fi
 
             if $REBUILD_DOWNSTREAM ; then
               echo "Parent image changed, rebuilding"
