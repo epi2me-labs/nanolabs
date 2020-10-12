@@ -5,7 +5,7 @@ variables:
       PICO: "picolabs"
       NANO: "nanolabs"
       PUSH_IMAGE: "nanolabs-notebook"
-      GUPPY: ont-guppy-cpu_3.5.2_linux64.tar.gz
+      GUPPY: ont-guppy-cpu_4.2.2_linux64.tar.gz
 image: ${IMAGE}
 
 stages:

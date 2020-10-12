@@ -32,13 +32,13 @@ RUN \
     'bedtools=2.29.2' \
     'bcftools=1.10.2' \
     'centrifuge=1.0.4_beta' \
-    'flye=2.7' \
+    'flye=2.8.1' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
     'mosdepth=0.2.9' \
     'pomoxis=0.3.4' \
     'pyranges=0.0.76' \
-    'pysam=0.15.3' \
+    'pysam=0.16.0.1' \
     'racon=1.4.10' \
     ##'rtg-tools=3.11' \
     'samtools=1.10' \
@@ -50,13 +50,11 @@ RUN \
   && fix-permissions $CONDA_DIR \
   && fix-permissions /home/$NB_USER
 
-# medaka has some specific reqs -> install into venv
-ARG MEDAKA_VERSION=1.0.3
+# Installing medaka into main environment causes:
+#   "Problem: package pomoxis-0.3.4-py_0 requires python >=3.4,<3.7"
+# Which is odd because we should be on python3.6
 RUN \
-  python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
-  && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
-  && pip install --no-cache-dir --upgrade pip \
-  && pip install --no-cache-dir medaka==${MEDAKA_VERSION}
+  mamba create -y -n medaka medaka==1.1.2
 
 # some tools to support sniffles SV calling
 ARG SV_PIPELINE_TAG=v1.6.1
