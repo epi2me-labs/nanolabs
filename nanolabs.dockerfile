@@ -59,7 +59,7 @@ RUN \
 #   "Problem: package pomoxis-0.3.4-py_0 requires python >=3.4,<3.7"
 # Which is odd because we should be on python3.6
 RUN \
-  mamba create -y -n medaka medaka==1.1.2
+  mamba create -y -n medaka medaka==1.1.3
 
 # some tools to support sniffles SV calling
 ARG SV_PIPELINE_TAG=v1.6.1
