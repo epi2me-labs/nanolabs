@@ -52,6 +52,22 @@ build:docker:
     before_script:
         - apk add make bash git openssl
         - REF=${CI_COMMIT_REF_NAME}
+        # obtain aplanat and epi2melabs versions
+        # TODO: do this another way?
+        - >
+            mkdir deps && cd deps;
+            git clone https://${CI_SERVER_HOST}/epi2melabs/aplanat \
+              && cd aplanat \
+              && export APLANAT_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && cd ..;
+            git clone https://${CI_SERVER_HOST}/epi2melabs/epi2melabs \
+              && cd epi2melabs \
+              && export EPI2MELABS_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && cd ..;
+            echo "Using versions:";
+            echo "  aplanat   : ${APLANAT_VERSION}";
+            echo "  epi2melabs: ${EPI2MELABS_VERSION}";
+            cd ..;
     script:
         - tar -xzf ${GUPPY}
         - >

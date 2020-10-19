@@ -42,7 +42,16 @@ minimal-notebook:
 picolabs-notebook:
 > docker build --rm --force-rm $(PICOLABSARGS) -t $(OWNER)/$@:latest -f picolabs.dockerfile .
 
+# require that we have been given a few version strings
+check-versions:
+ifndef APLANAT_VERSION
+	$(error APLANAT_VERSION is undefined)
+endif
+ifndef EPI2MELABS_VERSION
+	$(error EPI2MELABS_VERSION is undefined)
+endif
+
 .PHONY: nanolabs-notebook
-nanolabs-notebook:
-> docker build --rm --force-rm $(NANOLABSARGS) -t $(OWNER)/$@:latest -f nanolabs.dockerfile .
+nanolabs-notebook: check-versions
+> docker build --rm --force-rm $(NANOLABSARGS) --build-arg APLANAT_VERSION=$(APLANAT_VERSION) --build-arg EPI2MELABS_VERSION=$(EPI2MELABS_VERSION) -t $(OWNER)/$@:latest -f nanolabs.dockerfile .
 

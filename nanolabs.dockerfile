@@ -4,8 +4,13 @@
 ARG BASE_CONTAINER=ontresearch/picolabs-notebook:latest
 FROM $BASE_CONTAINER
 ARG DATE=unknown
-
 LABEL maintainer="Oxford Nanopore Technologies"
+
+ARG APLANAT_VERSION
+ARG EPI2MELABS_VERSION
+
+RUN test -n "$APLANAT_VERSION" || (echo "APLANAT_VERSION  not set" && false)
+RUN test -n "$EPI2MELABS_VERSION" || (echo "EPI2MELABS_VERSION  not set" && false)
 
 USER root
 
@@ -75,7 +80,7 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==0.2.0 epi2melabs==0.0.12
+  pip install --no-cache-dir aplanat==${APLANAT_VERSION} epi2melabs==${EPI2MELABS_VERSION}
 
 # notebooks - installed to ${RESOURCE_DIR}
 # TODO: checkout a tag? just force docker cache miss for now
