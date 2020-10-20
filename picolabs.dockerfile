@@ -47,9 +47,11 @@ RUN \
     'matplotlib-base=3.2.*' \
     'conda-forge::r-base=4.0.2' \
     'conda-forge::r-essentials' \
+    'jupyter-lsp' \
     'parallel' \
     'pandas=1.1.*' \
     'protobuf=3.12.*' \
+    'python-language-server' \
     'scikit-learn=0.23.*' \
     'scipy=1.5.*' \
     'seaborn=0.10.*' \
@@ -69,12 +71,16 @@ RUN \
   # Check this URL for most recent compatibilities
   # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
   && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build \
-  ## table of contents, added for no colab option
+  ## table of contents in left-hand panel for navigation
   && jupyter labextension install @jupyterlab/toc --no-build \
+  ## our own modifications
   && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
+  ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
+  ## language server
+  && jupyter labextension install @krassowski/jupyterlab-lsp --no-build \
   ## colab extension
   && pip install --no-cache-dir jupyter_http_over_ws \
   && jupyter serverextension enable --py jupyter_http_over_ws \
@@ -90,9 +96,10 @@ RUN \
   #&& jupyter labextension install plotlywidget@1.5.0 --no-build \
   #&& unset NODE_OPTIONS \
   ## github extension
-  # not needed in colab, added for nocolab option
-  && jupyter labextension install @jupyterlab/github --no-build \
-  && pip install jupyterlab_github \
+  # not needed in colab, added for nocolab option, removed as its
+  # unauthenticated and so of limited utility
+  #&& jupyter labextension install @jupyterlab/github --no-build \
+  #&& pip install jupyterlab_github \
   # build things
   && jupyter lab build -y \
   && jupyter lab clean -y \
@@ -102,6 +109,13 @@ RUN \
   && rm -rf "/home/${NB_USER}/.node-gyp" \
   && fix-permissions "${CONDA_DIR}" \
   && fix-permissions "/home/${NB_USER}"
+
+# copy user settings for jupyterlab
+USER root
+COPY user-settings /home/$NB_USER/.jupyter/lab/user-settings
+COPY config/pycodestyle /home/$NB_USER/.config/ 
+RUN fix-permissions "/home/${NB_USER}"
+USER $NB_UID
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME="/home/${NB_USER}/.cache/"

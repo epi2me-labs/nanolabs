@@ -1,0 +1,12 @@
+{
+  "language_servers": {
+    "pyls": {
+      "serverSettings": {
+        "pyls.plugins.pycodestyle.enabled": true,
+        "pyls.plugins.pydocstyle.enabled": true,
+        "pyls.plugins.pyflakes.enabled": false,
+        "pyls.plugins.flake8.enabled": false,
+      }
+    },
+  }
+}
