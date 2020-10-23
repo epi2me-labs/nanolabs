@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- EPI2ME Labs splashpage
 - Code-cell collapse to comment extension
 - Code-cell play button extension
 - Auto-run cells extension

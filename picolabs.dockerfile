@@ -77,6 +77,7 @@ RUN \
   && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
+  && jupyter labextension install @epi2melabs/epi2melabs-splashpage --no-build \
   ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## language server
