@@ -113,6 +113,7 @@ RUN CACHEMISS=${DATE} \
 ENV NB_HOST_USER=nbhost
 USER root
 COPY run_as_user.sh /usr/local/bin/
+COPY startup.sh /usr/local/bin/start-notebook.d/
 RUN \
   # allow notebook user to add new users, see run_as_user.sh
   echo "${NB_USER} ALL=(root) NOPASSWD: /usr/sbin/useradd" > /etc/sudoers.d/${NB_USER} \
