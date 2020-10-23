@@ -88,7 +88,7 @@ USER $NB_UID
 RUN CACHEMISS=${DATE} \
   && jupyter trust --reset \
   && cd /home/$NB_USER \
-  && for repo in resources tutorials; do \
+  && for repo in tutorials; do \
     git clone --depth 1 https://github.com/epi2me-labs/${repo}.git; \
     mkdir ${RESOURCE_DIR}/${repo}; \
     cp ${repo}/*.ipynb ${RESOURCE_DIR}/${repo}; \
