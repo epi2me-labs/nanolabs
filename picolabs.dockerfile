@@ -40,7 +40,7 @@ RUN \
   conda config --system --append channels bioconda \
   && conda install mamba --quiet --yes \
   && mamba install --quiet --yes \
-    'bokeh=2.1.*' \
+    'bokeh=2.2.*' \
     'jupyter_bokeh' \
     'conda-forge::blas=*=openblas' \
     'ipywidgets=7.5.*' \
