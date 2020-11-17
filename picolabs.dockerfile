@@ -63,6 +63,9 @@ RUN \
   && fix-permissions "${CONDA_DIR}" \
   && fix-permissions "/home/${NB_USER}"
 
+RUN \
+  pip install igv-jupyterlab
+
 # jupyter extensions
 RUN \
   ## Activate ipywidgets extension in the environment that runs the notebook server
@@ -78,6 +81,7 @@ RUN \
   && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
   && jupyter labextension install @epi2melabs/epi2melabs-splashpage --no-build \
+  && jupyter labextension install @jupyter-widgets/jupyterlab-manager --no-build \
   ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## language server
