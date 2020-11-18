@@ -75,6 +75,8 @@ RUN \
   && jupyter labextension install @jupyterlab/toc --no-build \
   ## our own modifications
   && pip install --no-cache-dir igv-jupyterlab \
+  ## shouldn't need this, but further investigation is required to debug
+  && jupyter labextension install @epi2melabs/igv-jupyterlab --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
