@@ -63,9 +63,6 @@ RUN \
   && fix-permissions "${CONDA_DIR}" \
   && fix-permissions "/home/${NB_USER}"
 
-RUN \
-  pip install igv-jupyterlab
-
 # jupyter extensions
 RUN \
   ## Activate ipywidgets extension in the environment that runs the notebook server
@@ -77,6 +74,7 @@ RUN \
   ## table of contents in left-hand panel for navigation
   && jupyter labextension install @jupyterlab/toc --no-build \
   ## our own modifications
+  && pip install --no-cache-dir igv-jupyterlab \
   && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
   && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
