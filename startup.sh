@@ -1,16 +1,22 @@
 # Startup script for epi2melabs container
-#   This is run by start.sh from docker-stats
+#   This is run by start.sh from docker-stats, it is also run by the
+#   labslauncher application at certain times.
 #   The docker file installs it to /usr/local/bin/start-notebook.d/
 
 
+trust_path () {
+    DIR=$1
+    for file in $(find ${DIR} -name "*.ipynb"); do
+        echo "Adding trust: ${file}"
+        jupyter trust ${file}
+    done
+}
+
+# new notebooks from templates are saved here
 MOUNT=/epi2melabs/
 NOTEBOOKDIR=${MOUNT}/notebooks/
-
-# new notebooks from templates are saved here:
 mkdir -p ${NOTEBOOKDIR}
+trust_path ${NOTEBOOKDIR}
 
-# trust any notebooks in the directory where we save
-for file in $(find ${NOTEBOOKDIR} -name "*.ipynb"); do
-    echo "Adding trust: ${file}"
-    jupyter trust ${file}
-done 
+# templates
+trust_path /epi2me-resources/tutorials

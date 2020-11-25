@@ -22,7 +22,7 @@ RUN apt-get update \
      python-virtualenv git-lfs libxml2-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# for notebooks etc - see below
+# for notebooks etc
 ARG RESOURCE_DIR=/epi2me-resources
 RUN \
   mkdir ${RESOURCE_DIR} \
@@ -81,33 +81,6 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 # our plotting and misc libraries, not on conda
 RUN \
   pip install --no-cache-dir aplanat==${APLANAT_VERSION} epi2melabs==${EPI2MELABS_VERSION}
-
-# notebooks - installed to ${RESOURCE_DIR}
-# TODO: checkout a tag? just force docker cache miss for now
-USER $NB_UID
-RUN CACHEMISS=${DATE} \
-  && jupyter trust --reset \
-  && cd /home/$NB_USER \
-  && for repo in tutorials; do \
-    git clone --depth 1 https://github.com/epi2me-labs/${repo}.git; \
-    mkdir ${RESOURCE_DIR}/${repo}; \
-    cp ${repo}/*.ipynb ${RESOURCE_DIR}/${repo}; \
-    for file in ${RESOURCE_DIR}/${repo}/*.ipynb; do \
-      echo ${file}; \
-      # preserve the colab breakout link; but move other links
-      # the breakout link has href=\"...
-      # others are markdown with ](...
-      # capture repo from colab link and create relative link
-      sed -i -E 's#[^"]https://colab.research.google.com/github/epi2me-labs/([^/]+)/blob/master/#(../\1/#g' ${file}; \
-      # we need to trust the file for e.g. bokeh plots to show
-      jupyter trust ${file}; \
-      # prevent users modifying canon
-      chmod a-w ${file}; \
-    done; \
-    rm -rf ${repo}; \
-  done
-  # need to fix permissions here but done below as root
-  #    --- erm, this doesn't seem to be done?
 
 # copy script for injecting user permissions
 ENV NB_HOST_USER=nbhost

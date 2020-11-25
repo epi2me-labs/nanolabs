@@ -38,7 +38,7 @@ USER $NB_UID
 
 RUN \
   conda config --system --append channels bioconda \
-  && conda install mamba --quiet --yes \
+  && conda install mamba==0.7.1 --quiet --yes \
   && mamba install --quiet --yes \
     'bokeh=2.2.*' \
     'jupyter_bokeh' \
