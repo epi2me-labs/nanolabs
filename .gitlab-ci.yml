@@ -191,4 +191,5 @@ downstream:epi2melabs:
         branch: dev
     only:
         - tags
+        - /^dev$/
 
