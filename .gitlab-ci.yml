@@ -12,6 +12,7 @@ stages:
     - fetch
     - build
     - push
+    - downstream
 
 # fetch guppy, unpack, keep only ancilliary programs (barcoding)
 fetch:guppy:
@@ -181,3 +182,13 @@ push:dev-dockerhub:
     variables:
         TAG: ontresearch/${PUSH_IMAGE}:dev
     <<: *push_hub
+
+# when we've tagged rebuild the downstream
+downstream:epi2melabs:
+    stage: downstream
+    trigger:
+        project: epi2melabs/tutorials
+        branch: dev
+    only:
+        - tags
+
