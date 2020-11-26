@@ -58,8 +58,14 @@ RUN \
 # Installing medaka into main environment causes:
 #   "Problem: package pomoxis-0.3.4-py_0 requires python >=3.4,<3.7"
 # Which is odd because we should be on python3.6
+# Since we're doing things in a separate end anyway, lets use
+# pip and take the (the smaller) medaka/tensorflow-cpu package
+ARG MEDAKA_VERSION=1.2.1
 RUN \
-  mamba create -y -n medaka medaka==1.1.3
+  python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
+  && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
+  && pip install --no-cache-dir --upgrade pip \
+  && pip install --no-cache-dir medaka-cpu==${MEDAKA_VERSION}
 
 # some tools to support sniffles SV calling
 ARG SV_PIPELINE_TAG=v1.6.1
