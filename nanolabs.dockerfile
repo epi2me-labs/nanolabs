@@ -88,17 +88,6 @@ COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
 RUN \
   pip install --no-cache-dir aplanat==${APLANAT_VERSION} epi2melabs==${EPI2MELABS_VERSION}
 
-# copy script for injecting user permissions
-ENV NB_HOST_USER=nbhost
-USER root
-COPY run_as_user.sh /usr/local/bin/
-COPY startup.sh /usr/local/bin/start-notebook.d/
-RUN \
-  # allow notebook user to add new users, see run_as_user.sh
-  echo "${NB_USER} ALL=(root) NOPASSWD: /usr/sbin/useradd" > /etc/sudoers.d/${NB_USER} \
-  # and allow notebook user to run notebook as NB_HOST_USER
-  && echo "${NB_USER} ALL=(${NB_HOST_USER}) NOPASSWD:SETENV: /usr/local/bin/start-notebook.sh" >> /etc/sudoers.d/${NB_USER} \
-  && fix-permissions ${HOME}
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID

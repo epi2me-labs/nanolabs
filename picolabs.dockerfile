@@ -82,6 +82,7 @@ RUN \
   && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
   && jupyter labextension install @epi2melabs/epi2melabs-splashpage --no-build \
   && jupyter labextension install @epi2melabs/epi2melabs-splash --no-build \
+  && jupyter labextension install @epi2melabs/epi2melabs-theme --no-build \
   ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## language server
@@ -106,7 +107,7 @@ RUN \
   #&& jupyter labextension install @jupyterlab/github --no-build \
   #&& pip install jupyterlab_github \
   # build things
-  && jupyter lab build -y \
+  && jupyter lab build -y --name='EPI2MELabs' \
   && jupyter lab clean -y \
   && npm cache clean --force \
   && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
@@ -118,8 +119,24 @@ RUN \
 # copy user settings for jupyterlab
 USER root
 COPY user-settings /home/$NB_USER/.jupyter/lab/user-settings
-COPY config/pycodestyle /home/$NB_USER/.config/ 
+COPY config/pycodestyle /home/$NB_USER/.config/
 RUN fix-permissions "/home/${NB_USER}"
+# favicon
+COPY favicon.png /opt/conda/share/jupyterhub/static/favicon.ico 
+COPY favicon.png /opt/conda/lib/python3.6/site-packages/notebook/static/favicon.ico 
+COPY favicon.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/images/favicon.ico
+# default theme (can this be in user-settings?)
+COPY overrides.json /opt/conda/share/jupyter/lab/settings/overrides.json
+# copy script for injecting user permissions
+ENV NB_HOST_USER=nbhost
+COPY run_as_user.sh /usr/local/bin/
+COPY startup.sh /usr/local/bin/start-notebook.d/
+RUN \
+  # allow notebook user to add new users, see run_as_user.sh
+  echo "${NB_USER} ALL=(root) NOPASSWD: /usr/sbin/useradd" > /etc/sudoers.d/${NB_USER} \
+  # and allow notebook user to run notebook as NB_HOST_USER
+  && echo "${NB_USER} ALL=(${NB_HOST_USER}) NOPASSWD:SETENV: /usr/local/bin/start-notebook.sh" >> /etc/sudoers.d/${NB_USER} \
+  && fix-permissions ${HOME}
 USER $NB_UID
 
 # Import matplotlib the first time to build the font cache.
