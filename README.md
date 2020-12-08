@@ -36,15 +36,3 @@ make run
 When this runs a token will be displayed. This can be used to connect
 to the server in a browser.
 
-## Connecting Google Colab
-
-https://colab.research.google.com/
-
-Google Colaboratory can be told to connect to the locally running Jupyter
-server. In this way an end-user gets the niceities of Google Colab whilst
-having a preconfigured environment. There is a drop-down in the top-left
-of the Colab interface to "Connect > Connect to local runtime...". In the
-pop-up dialog enter
-
-`http://localhost:8888/?token=<token from above>`
-
