@@ -87,9 +87,6 @@ RUN \
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## language server
   && jupyter labextension install @krassowski/jupyterlab-lsp --no-build \
-  ## colab extension
-  && pip install --no-cache-dir jupyter_http_over_ws \
-  && jupyter serverextension enable --py jupyter_http_over_ws \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh@2.0.3 --no-build \
   ## interactive matplotlib graphs
