@@ -18,8 +18,9 @@ RUN apt-get update \
   && apt-get install -yq --no-install-recommends \
      vim bsdmainutils tree \
      bzip2 zlib1g-dev libbz2-dev liblzma-dev libffi-dev libncurses5-dev \
-     libcurl4-gnutls-dev libssl-dev curl make cmake wget python3-all-dev \
-     python-virtualenv git-lfs libxml2-dev \
+     libcurl4-gnutls-dev libssl-dev curl make cmake wget \
+     python3-all-dev python3-venv \
+     git-lfs libxml2-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # for notebooks etc
@@ -33,19 +34,17 @@ USER $NB_UID
 # Install additional modules into root
 RUN \
   mamba install --quiet --yes \
-    'blast=2.9.0' \
+    #'blast=2.9.0' \
     'bedtools=2.29.2' \
     'bcftools=1.10.2' \
-    'centrifuge=1.0.4_beta' \
     'flye=2.8.1' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
     'mosdepth=0.2.9' \
-    'pomoxis=0.3.4' \
+    'pomoxis=0.3.5' \
     'pyranges=0.0.76' \
     'pysam=0.16.0.1' \
     'racon=1.4.10' \
-    ##'rtg-tools=3.11' \
     'samtools=1.10' \
     'seqkit=0.13.2' \
     'sniffles=1.0.11' \
@@ -66,16 +65,6 @@ RUN \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
   && pip install --no-cache-dir --upgrade pip \
   && pip install --no-cache-dir medaka-cpu==${MEDAKA_VERSION}
-
-# some tools to support sniffles SV calling
-ARG SV_PIPELINE_TAG=v1.6.1
-RUN \
-  git clone --depth 1 --branch ${SV_PIPELINE_TAG} https://github.com/nanoporetech/pipeline-structural-variation.git \
-  && python3 -m venv ${CONDA_DIR}/envs/venv_svtools --prompt "(svtools) " \
-  && . ${CONDA_DIR}/envs/venv_svtools/bin/activate \
-  && cd pipeline-structural-variation/lib \
-  && pip install --no-cache-dir . \
-  && cd .. && rm -rf pipeline-structural-variation
 
 # install guppy (minus the basecalling)
 COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
