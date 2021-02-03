@@ -9,7 +9,10 @@ index 089334d..d1286d4 100644
 -    'jupyterlab=3.0.5' && \
 +    'notebook=6.0.3' \
 +    'jupyterhub=1.1.0' \
-+    'jupyterlab=2.2.9' && \
++    'jupyterlab=2.2.9' \
++    'ipykernel=5.3.4' \
++    'ipython=7.16.1' \
++    'ipywidgets=7.5.1' && \
      conda clean --all -f -y && \
      npm cache clean --force && \
      jupyter notebook --generate-config && \

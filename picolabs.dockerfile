@@ -32,15 +32,9 @@ USER $NB_UID
 
 RUN \
   conda config --system --append channels bioconda \
-  && conda install mamba==0.7.1 --quiet --yes \
-  # These first few should be removed at some point,
-  # https://github.com/ipython/ipykernel/issues/540,
-  # they are the version we had previously before
-  # upgrading to Python 3.8
-  && mamba install --quiet --yes \
-    'ipykernel=5.3.4' \
-    'ipython=7.16.1' \
-    'ipywidgets=7.5.1' \
+  && conda install mamba --quiet --yes \
+  # ipywidgets is commented here as we do it upfront in the
+  # patch to the base image
   && mamba install --quiet --yes \
     'bokeh=2.2.*' \
     'jupyter_bokeh' \
