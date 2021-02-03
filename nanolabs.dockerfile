@@ -63,7 +63,7 @@ ARG MEDAKA_VERSION=1.2.1
 RUN \
   python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
-  && pip install --no-cache-dir --upgrade pip \
+  && pip install --no-cache-dir --upgrade pip wheel \
   && pip install --no-cache-dir medaka-cpu==${MEDAKA_VERSION}
 
 # install guppy (minus the basecalling)
