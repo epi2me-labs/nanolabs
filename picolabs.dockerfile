@@ -35,11 +35,13 @@ RUN \
   && conda install mamba --quiet --yes \
   # ipywidgets is commented here as we do it upfront in the
   # patch to the base image
-  && mamba install --quiet --yes \
+  && mamba install --quiet --yes --freeze-installed \
     'bokeh=2.2.*' \
     'jupyter_bokeh' \
     'conda-forge::blas=*=openblas' \
     #'ipywidgets=7.6.*' \
+    'jupyter-lsp=0.9.3' \
+    'python-language-server=0.36.2' \
     'matplotlib-base=3.3.*' \
     'conda-forge::r-base=4.0.3' \
     'conda-forge::r-essentials' \
@@ -76,8 +78,10 @@ RUN \
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh@2.0.3 --no-build \
+  ## language server frontend
+  && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 \
   # build things
-  && jupyter lab build -y --name='EPI2MELabs' \
+  && jupyter lab build -y --name='EPI2MELabs' --dev-build=False --minimize=True \
   && jupyter lab clean -y \
   && npm cache clean --force \
   && rm -rf "${CONDA_DIR}/share/jupyter/lab/staging" \
