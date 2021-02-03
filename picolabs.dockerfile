@@ -47,7 +47,7 @@ RUN \
     'parallel' \
     'pandas=1.2.*' \
     'protobuf=3.14.*' \
-    'python-language-server' \
+    'python-language-server=0.36.1' \
     'scikit-learn=0.24.*' \
     'scipy=1.6.*' \
     'widgetsnbextension=3.5.*' \
