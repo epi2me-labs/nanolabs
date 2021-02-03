@@ -40,7 +40,7 @@ RUN \
   && mamba install --quiet --yes \
     'ipykernel=5.3.4' \
     'ipython=7.16.1' \
-    'ipywidgets=7.5.1'
+    'ipywidgets=7.5.1' \
   && mamba install --quiet --yes \
     'bokeh=2.2.*' \
     'jupyter_bokeh' \
