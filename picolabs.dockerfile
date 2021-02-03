@@ -77,7 +77,7 @@ RUN \
   ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## language server
-  && jupyter labextension install @krassowski/jupyterlab-lsp --no-build \
+  && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 --no-build \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh@2.0.3 --no-build \
   # build things
