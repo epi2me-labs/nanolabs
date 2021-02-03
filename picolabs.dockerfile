@@ -33,14 +33,19 @@ USER $NB_UID
 RUN \
   conda config --system --append channels bioconda \
   && conda install mamba==0.7.1 --quiet --yes \
-  # ipykernel is pinned here simply to avoid messy DeprecationWarnings
-  #   # (possibly resulting from retrofitting jupyterlab 2.2.9?)
+  # These first few should be removed at some point,
+  # https://github.com/ipython/ipykernel/issues/540,
+  # they are the version we had previously before
+  # upgrading to Python 3.8
+  && mamba install --quiet --yes \
+    'ipykernel=5.3.4' \
+    'ipython=7.16.1' \
+    'ipywidgets=7.5.1'
   && mamba install --quiet --yes \
     'bokeh=2.2.*' \
     'jupyter_bokeh' \
     'conda-forge::blas=*=openblas' \
-    'ipykernel=5.3.4' \
-    'ipywidgets=7.6.*' \
+    #'ipywidgets=7.6.*' \
     'matplotlib-base=3.3.*' \
     'conda-forge::r-base=4.0.3' \
     'conda-forge::r-essentials' \
