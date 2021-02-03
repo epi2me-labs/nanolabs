@@ -71,7 +71,9 @@ COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
 ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
 
 # replace centrifuge download with one that just does http with wget (not ftp)
-COPY centrifuge-download.http /opt/conda/bin/centrifuge-download
+RUN mkdir -p /home/$NB_USER/.local/bin/
+ENV PATH=/home/$NB_USER/.local/bin/:$PATH
+COPY centrifuge-download.http /home/$NB_USER/.local/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
