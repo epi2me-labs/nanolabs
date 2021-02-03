@@ -34,7 +34,6 @@ USER $NB_UID
 # Install additional modules into root
 RUN \
   mamba install --quiet --yes \
-    #'blast=2.9.0' \
     'bedtools=2.29.2' \
     'bcftools=1.10.2' \
     'flye=2.8.1' \

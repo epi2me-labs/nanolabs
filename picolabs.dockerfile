@@ -43,11 +43,9 @@ RUN \
     'matplotlib-base=3.3.*' \
     'conda-forge::r-base=4.0.3' \
     'conda-forge::r-essentials' \
-    'jupyter-lsp' \
     'parallel' \
     'pandas=1.2.*' \
     'protobuf=3.14.*' \
-    'python-language-server=0.36.1' \
     'scikit-learn=0.24.*' \
     'scipy=1.6.*' \
     'widgetsnbextension=3.5.*' \
@@ -76,8 +74,6 @@ RUN \
   && jupyter labextension install @epi2melabs/epi2melabs-theme --no-build \
   ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
-  ## language server
-  && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 --no-build \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh@2.0.3 --no-build \
   # build things
