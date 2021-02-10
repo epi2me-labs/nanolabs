@@ -33,6 +33,9 @@ endif
 ifndef EPI2MELABS_VERSION
 	$(error EPI2MELABS_VERSION is undefined)
 endif
+ifndef MAPULA_VERSION
+	$(error MAPULA_VERSION is undefined)
+endif
 
 .PHONY: base-notebook
 base-notebook:
@@ -47,5 +50,5 @@ picolabs-notebook:
 
 .PHONY: nanolabs-notebook
 nanolabs-notebook: check-versions
-> docker build --rm --force-rm $(NANOLABSARGS) --build-arg APLANAT_VERSION=$(APLANAT_VERSION) --build-arg EPI2MELABS_VERSION=$(EPI2MELABS_VERSION) -t $(OWNER)/$@:latest -f nanolabs.dockerfile .
+> docker build --rm --force-rm $(NANOLABSARGS) --build-arg APLANAT_VERSION=$(APLANAT_VERSION) --build-arg EPI2MELABS_VERSION=$(EPI2MELABS_VERSION) --build-arg MAPULA_VERSION=$(MAPULA_VERSION) -t $(OWNER)/$@:latest -f nanolabs.dockerfile .
 

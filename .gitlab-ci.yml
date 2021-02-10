@@ -65,9 +65,14 @@ build:docker:
               && cd epi2melabs \
               && export EPI2MELABS_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
               && cd ..;
+            git clone https://${CI_SERVER_HOST}/epi2melabs/mapula \
+              && cd mapula \
+              && export MAPULA_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && cd ..;
             echo "Using versions:";
             echo "  aplanat   : ${APLANAT_VERSION}";
             echo "  epi2melabs: ${EPI2MELABS_VERSION}";
+            echo "  mapula: ${MAPULA_VERSION}";
             cd ..;
     script:
         - tar -xzf ${GUPPY}

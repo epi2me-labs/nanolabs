@@ -8,9 +8,11 @@ LABEL maintainer="Oxford Nanopore Technologies"
 
 ARG APLANAT_VERSION
 ARG EPI2MELABS_VERSION
+ARG MAPULA_VERSION
 
 RUN test -n "$APLANAT_VERSION" || (echo "APLANAT_VERSION  not set" && false)
 RUN test -n "$EPI2MELABS_VERSION" || (echo "EPI2MELABS_VERSION  not set" && false)
+RUN test -n "$MAPULA_VERSION" || (echo "MAPULA_VERSION  not set" && false)
 
 USER root
 
@@ -76,7 +78,7 @@ COPY centrifuge-download.http /home/$NB_USER/.local/bin/centrifuge-download
 
 # our plotting and misc libraries, not on conda
 RUN \
-  pip install --no-cache-dir aplanat==${APLANAT_VERSION} epi2melabs==${EPI2MELABS_VERSION}
+  pip install --no-cache-dir aplanat==${APLANAT_VERSION} epi2melabs==${EPI2MELABS_VERSION} mapula==${MAPULA_VERSION}
 
 
 # Switch back to jovyan to avoid accidental container runs as root
