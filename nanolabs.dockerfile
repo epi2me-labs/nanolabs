@@ -60,7 +60,7 @@ RUN \
 # Which is odd because we should be on python3.6
 # Since we're doing things in a separate end anyway, lets use
 # pip and take the (the smaller) medaka/tensorflow-cpu package
-ARG MEDAKA_VERSION=1.2.1
+ARG MEDAKA_VERSION=1.2.4
 RUN \
   python3 -m venv ${CONDA_DIR}/envs/venv_medaka --prompt "(medaka) " \
   && . ${CONDA_DIR}/envs/venv_medaka/bin/activate \
