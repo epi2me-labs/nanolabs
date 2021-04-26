@@ -37,7 +37,8 @@ RUN \
   # patch to the base image
   && mamba install --quiet --yes --freeze-installed \
     'bokeh=2.2.*' \
-    'jupyter_bokeh=2.0.*' \
+    # note also occurs below as lab extension
+    'jupyter_bokeh=2.0.4' \
     'conda-forge::blas=*=openblas' \
     #'ipywidgets=7.6.*' \
     'jupyter-lsp=0.9.3' \
@@ -77,7 +78,7 @@ RUN \
   ## allow markdown headings to collapse whole sections
   && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
   ## bokeh
-  && jupyter labextension install @bokeh/jupyter_bokeh@2.0.3 --no-build \
+  && jupyter labextension install @bokeh/jupyter_bokeh@2.0.4 --no-build \
   ## language server frontend
   && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 \
   # build things
