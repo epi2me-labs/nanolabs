@@ -37,7 +37,7 @@ RUN \
   # patch to the base image
   && mamba install --quiet --yes --freeze-installed \
     'bokeh=2.2.*' \
-    'jupyter_bokeh' \
+    'jupyter_bokeh=2.0.*' \
     'conda-forge::blas=*=openblas' \
     #'ipywidgets=7.6.*' \
     'jupyter-lsp=0.9.3' \
