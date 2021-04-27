@@ -80,7 +80,7 @@ RUN \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh@2.0.4 --no-build \
   ## language server frontend
-  && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 \
+  && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 --no-build \
   # build things
   && jupyter lab build -y --name='EPI2MELabs' --dev-build=False --minimize=True \
   && jupyter lab clean -y \
