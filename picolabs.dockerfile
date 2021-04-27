@@ -76,7 +76,7 @@ RUN \
   && jupyter labextension install @epi2melabs/epi2melabs-splash --no-build \
   && jupyter labextension install @epi2melabs/epi2melabs-theme --no-build \
   ## allow markdown headings to collapse whole sections
-  && jupyter labextension install @aquirdturtle/collapsible_headings --no-build \
+  && jupyter labextension install @aquirdturtle/collapsible_headings@2.3.0 --no-build \
   ## bokeh
   && jupyter labextension install @bokeh/jupyter_bokeh@2.0.4 --no-build \
   ## language server frontend
