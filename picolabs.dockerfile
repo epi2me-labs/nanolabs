@@ -63,24 +63,20 @@ RUN \
   ## Activate ipywidgets extension in the environment that runs the notebook server
   jupyter nbextension enable --py widgetsnbextension --sys-prefix \
   ## Also activate ipywidgets extension for JupyterLab
-  ##&& pip install jupyterlab_widgets \ # for JL3.x
-  && jupyter labextension install @jupyter-widgets/jupyterlab-manager@^2.0.0 --no-build \
-  ## our own modifications
-  && pip install --no-cache-dir igv-jupyterlab \
-  ## shouldn't need this, but further investigation is required to debug
-  && jupyter labextension install @epi2melabs/igv-jupyterlab --no-build \
-  && jupyter labextension install @epi2melabs/jupyterlab-autorun-cells --no-build \
-  && jupyter labextension install @epi2melabs/jupyterlab-play-cell-button --no-build \
-  && jupyter labextension install @epi2melabs/jupyterlab-code-cell-collapser --no-build \
-  && jupyter labextension install @epi2melabs/epi2melabs-splashpage --no-build \
-  && jupyter labextension install @epi2melabs/epi2melabs-splash --no-build \
-  && jupyter labextension install @epi2melabs/epi2melabs-theme --no-build \
-  ## allow markdown headings to collapse whole sections
-  && jupyter labextension install @aquirdturtle/collapsible_headings@2.3.0 --no-build \
-  ## bokeh
-  && jupyter labextension install @bokeh/jupyter_bokeh@2.0.4 --no-build \
-  ## language server frontend
-  && jupyter labextension install @krassowski/jupyterlab-lsp@2.1.3 --no-build \
+  && pip install jupyterlab_widgets \ 
+  # for JL3.x
+  ## our own modificationsa
+  && pip install --no-cache-dir \
+    # igv-jupyterlab \
+    aquirdturtle_collapsible_headings \
+    jupyter_bokeh \
+    jupyterlab-lsp \
+    jupyterlab-autorun-cells \
+    jupyterlab-play-cell-button \
+    jupyterlab-code-cell-collapser \
+    epi2melabs-splashpage \
+    epi2melabs-splash \
+    epi2melabs-theme \
   # build things
   && jupyter lab build -y --name='EPI2MELabs' --dev-build=False --minimize=True \
   && jupyter lab clean -y \

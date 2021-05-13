@@ -41,7 +41,6 @@ endif
 base-notebook:
 > cd docker-stacks
 > git checkout -- base-notebook/Dockerfile
-> patch -p0 -i ../baselabs.patch 
 > make build/base-notebook OWNER=$(OWNER) DARGS="$(BASEARGS)"
 
 .PHONY: picolabs-notebook
