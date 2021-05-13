@@ -34,14 +34,11 @@ RUN \
   conda config --system --append channels bioconda \
   && conda config --system --prepend channels epi2melabs \
   && conda install mamba --quiet --yes \
-  # ipywidgets is commented here as we do it upfront in the
-  # patch to the base image
   && mamba install --quiet --yes --freeze-installed \
     'bokeh=2.2.*' \
-    # note also occurs below as lab extension
-    'jupyter_bokeh=2.0.4' \
     'conda-forge::blas=*=openblas' \
-    #'ipywidgets=7.6.*' \
+    'ipywidgets=7.6.*' \
+    'hdf5=1.12.0' \
     'jupyter-lsp=0.9.3' \
     'python-language-server=0.36.2' \
     'matplotlib-base=3.3.*' \
