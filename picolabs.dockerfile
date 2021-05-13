@@ -32,6 +32,7 @@ USER $NB_UID
 
 RUN \
   conda config --system --append channels bioconda \
+  && conda config --system --prepend channels epi2melabs \
   && conda install mamba --quiet --yes \
   # ipywidgets is commented here as we do it upfront in the
   # patch to the base image

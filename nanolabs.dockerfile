@@ -42,6 +42,7 @@ RUN \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
     'mosdepth=0.2.9' \
+    'ncbitaxonomy==3.1.2=pyh7b7c402_3' \
     'pomoxis=0.3.5' \
     'pyranges=0.0.76' \
     'pysam=0.16.0.1' \
