@@ -67,7 +67,7 @@ RUN \
   # for JL3.x
   ## our own modificationsa
   && pip install --no-cache-dir \
-    # igv-jupyterlab \
+    igv-jupyterlab \
     aquirdturtle_collapsible_headings \
     jupyter_bokeh \
     jupyterlab-lsp \
