@@ -50,6 +50,9 @@ RUN \
     'scikit-learn=0.24.*' \
     'scipy=1.6.*' \
     'widgetsnbextension=3.5.*' \
+  && pip install --no-cache-dir \
+    'ipykernel==6.0.0a5' \
+    'ipython==7.21.0' \
   && mkdir ~/.parallel && touch ~/.parallel/will-cite \
   && conda clean --all -f -y \
   && conda init bash \
