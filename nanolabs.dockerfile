@@ -37,7 +37,7 @@ USER $NB_UID
 RUN \
   mamba install --quiet --yes \
     'bedtools=2.29.2' \
-    'bcftools=1.10.2' \
+    'bcftools=1.11' \
     'flye=2.8.1' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
@@ -47,10 +47,10 @@ RUN \
     'pyranges=0.0.76' \
     'pysam=0.16.0.1' \
     'racon=1.4.10' \
-    'samtools=1.10' \
+    'samtools=1.11' \
     'seqkit=0.13.2' \
     'sniffles=1.0.11' \
-    'tabix=0.2.6' \
+    'tabix=1.11' \
   && conda clean --all -f -y \
   && git lfs install \
   && fix-permissions $CONDA_DIR \
