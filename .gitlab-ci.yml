@@ -63,15 +63,18 @@ build:docker:
             mkdir deps && cd deps;
             git clone https://${CI_SERVER_HOST}/epi2melabs/aplanat \
               && cd aplanat \
-              && export APLANAT_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && export APLANAT_VERSION=${VER/v/} \
               && cd ..;
             git clone https://${CI_SERVER_HOST}/epi2melabs/epi2melabs \
               && cd epi2melabs \
-              && export EPI2MELABS_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && export EPI2MELABS_VERSION=${VER/v/} \
               && cd ..;
             git clone https://${CI_SERVER_HOST}/epi2melabs/mapula \
               && cd mapula \
-              && export MAPULA_VERSION=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+              && export MAPULA_VERSION=${VER/v/} \
               && cd ..;
             echo "Using versions:";
             echo "  aplanat   : ${APLANAT_VERSION}";

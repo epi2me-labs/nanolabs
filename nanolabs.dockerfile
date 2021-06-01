@@ -36,9 +36,13 @@ USER $NB_UID
 # Install additional modules into root
 RUN \
   mamba install --quiet --yes \
+    "'aplanat=${APLANAT_VERSION}'" \
+    'epi2melabs::barcoder=5.0.7_0' \
     'bedtools=2.29.2' \
     'bcftools=1.11' \
+    "'epi2melabs=${EPI2MELABS_VERSION}'" \
     'flye=2.8.1' \
+    "'mapula=${MAPULA_VERSION}'" \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
     'mosdepth=0.3.1' \
@@ -68,18 +72,10 @@ RUN \
   && pip install --no-cache-dir --upgrade pip wheel \
   && pip install --no-cache-dir medaka-cpu==${MEDAKA_VERSION}
 
-# install guppy (minus the basecalling)
-COPY ont-guppy-cpu /home/$NB_USER/ont-guppy-cpu
-ENV PATH=/home/$NB_USER/ont-guppy-cpu/bin/:$PATH
-
 # replace centrifuge download with one that just does http with wget (not ftp)
 RUN mkdir -p /home/$NB_USER/.local/bin/
 ENV PATH=/home/$NB_USER/.local/bin/:$PATH
 COPY centrifuge-download.http /home/$NB_USER/.local/bin/centrifuge-download
-
-# our plotting and misc libraries, not on conda
-RUN \
-  pip install --no-cache-dir aplanat==${APLANAT_VERSION} epi2melabs==${EPI2MELABS_VERSION} mapula==${MAPULA_VERSION}
 
 
 # Switch back to jovyan to avoid accidental container runs as root
