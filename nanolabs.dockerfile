@@ -41,7 +41,7 @@ RUN \
     'flye=2.8.1' \
     'minimap2=2.17' \
     'miniasm=0.3_r179' \
-    'mosdepth=0.2.9' \
+    'mosdepth=0.3.1' \
     'ncbitaxonomy==3.1.2=pyh7b7c402_3' \
     'pomoxis=0.3.5' \
     'pyranges=0.0.76' \
