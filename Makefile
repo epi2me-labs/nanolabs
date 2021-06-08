@@ -21,8 +21,9 @@ endif
 DATE=$(shell date +%s)
 
 OWNER := ontresearch
-BASEARGS     =
-PICOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/base-notebook
+BASEIMAGE =jupyter/base-notebook
+BASETAG =5cb007f03275
+PICOLABSARGS =--build-arg BASE_CONTAINER=$(BASEIMAGE):$(BASETAG)
 NANOLABSARGS =--build-arg BASE_CONTAINER=$(OWNER)/picolabs-notebook --build-arg DATE=$(DATE)
 
 # require that we have been given a few version strings
@@ -36,12 +37,6 @@ endif
 ifndef MAPULA_VERSION
 	$(error MAPULA_VERSION is undefined)
 endif
-
-.PHONY: base-notebook
-base-notebook:
-> cd docker-stacks
-> git checkout -- base-notebook/Dockerfile
-> make build/base-notebook OWNER=$(OWNER) DARGS="$(BASEARGS)"
 
 .PHONY: picolabs-notebook
 picolabs-notebook:

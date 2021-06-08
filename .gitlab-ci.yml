@@ -5,47 +5,52 @@ include:
 variables:
       OWNER: ontresearch
       GIT_SUBMODULE_STRATEGY: recursive
-      BASE: "base"
-      PICO: "picolabs"
-      NANO: "nanolabs"
       PUSH_IMAGE: "nanolabs-notebook"
-      GUPPY: ont-guppy-cpu_4.2.2_linux64.tar.gz
 image: ${IMAGE}
 
 stages:
-    - fetch
     - build
     - release
     - downstream
-
-# fetch guppy, unpack, keep only ancilliary programs (barcoding)
-fetch:guppy:
-    stage: fetch
-    only:
-        - branches
-    script:
-        # download guppy tar, remove basecalling models and programs
-        - wget --no-check-certificate ${GUPPYREPO}/${GUPPY}
-        - tar -xzvf ${GUPPY} && rm ${GUPPY}
-        - rm ont-guppy-cpu/data/*.jsn ont-guppy-cpu/bin/guppy_basecall*
-        - tar -czvf ${GUPPY} ont-guppy-cpu && rm -rf ont-guppy-cpu
-    artifacts:
-        paths:
-            - ${GUPPY}
 
 # on dev branch, push image with tag dev-<commit_sha>
 #   - used below in manual and main job
 #   - images from dev commits also go to dockerhub via
 #     the push:dev-dockerhub job
-.build:docker-after: &build-docker-after
-    after_script:
-        - if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
-              echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${ONTREGISTRY};
-              TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA};
-              echo "Pushing ${TAG}";
-              docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG};
-              docker push ${TAG};
-          fi;
+.build:docker-after: &build-docker-after |
+    if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
+        echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${ONTREGISTRY};
+        TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${PUSH_IMAGE}:${CI_COMMIT_BRANCH}-${CI_COMMIT_SHORT_SHA};
+        echo "Pushing ${TAG}";
+        docker tag ontresearch/${PUSH_IMAGE}:latest ${TAG};
+        docker push ${TAG};
+    fi;
+
+.get_dependency_versions: &get_dependency_versions |
+    # obtain aplanat and epi2melabs versions
+    # TODO: do this another way?
+    mkdir deps && cd deps;
+    git clone https://${CI_SERVER_HOST}/epi2melabs/aplanat \
+      && cd aplanat \
+      && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+      && export APLANAT_VERSION=${VER/v/} \
+      && cd ..;
+    git clone https://${CI_SERVER_HOST}/epi2melabs/epi2melabs \
+      && cd epi2melabs \
+      && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+      && export EPI2MELABS_VERSION=${VER/v/} \
+      && cd ..;
+    git clone https://${CI_SERVER_HOST}/epi2melabs/mapula \
+      && cd mapula \
+      && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
+      && export MAPULA_VERSION=${VER/v/} \
+      && cd ..;
+    echo "Using versions:";
+    echo "  aplanat   : ${APLANAT_VERSION}";
+    echo "  epi2melabs: ${EPI2MELABS_VERSION}";
+    echo "  mapula: ${MAPULA_VERSION}";
+    cd ..;
+
 
 # The main job. First time on a branch all images will be built,
 # subsequent build will try to reuse intermediate images if nothing
@@ -56,71 +61,47 @@ build:docker:
         - branches
     before_script:
         - apk add make bash git openssl
-        - REF=${CI_COMMIT_REF_NAME}
-        # obtain aplanat and epi2melabs versions
-        # TODO: do this another way?
-        - >
-            mkdir deps && cd deps;
-            git clone https://${CI_SERVER_HOST}/epi2melabs/aplanat \
-              && cd aplanat \
-              && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
-              && export APLANAT_VERSION=${VER/v/} \
-              && cd ..;
-            git clone https://${CI_SERVER_HOST}/epi2melabs/epi2melabs \
-              && cd epi2melabs \
-              && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
-              && export EPI2MELABS_VERSION=${VER/v/} \
-              && cd ..;
-            git clone https://${CI_SERVER_HOST}/epi2melabs/mapula \
-              && cd mapula \
-              && VER=$(git describe --tags $(git rev-list --tags --max-count=1)) \
-              && export MAPULA_VERSION=${VER/v/} \
-              && cd ..;
-            echo "Using versions:";
-            echo "  aplanat   : ${APLANAT_VERSION}";
-            echo "  epi2melabs: ${EPI2MELABS_VERSION}";
-            echo "  mapula: ${MAPULA_VERSION}";
-            cd ..;
+        - *get_dependency_versions
     script:
-        - tar -xzf ${GUPPY}
         - >
-          REBUILD_DOWNSTREAM=false;
-          ATTEMPT_PULL=true;
+          REBUILD=false;
           if [[ ${CI_COMMIT_BRANCH} == 'dev' ]]; then
             echo "=================================================="
             echo "Rebuilding all from scratch because branch is: dev"
             echo "=================================================="
-            REBUILD_DOWNSTREAM=true;
-            ATTEMPT_PULL=false;
+            REBUILD=true;
           fi
           
-          for CURRENT in $BASE $PICO $NANO;
-          do
+          for CURRENT in picolabs nanolabs; do
             IMAGE=${CURRENT}-notebook
             DOCKERFILE=${CURRENT}.dockerfile
-            TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${IMAGE}:${REF};
+            TAG=${ONTREGISTRY}/${CI_PROJECT_PATH}/${IMAGE}:${CI_COMMIT_REF_NAME}
 
-            if $ATTEMPT_PULL ; then
+            # Try to pull, test below checks if this worked
+            if ! ${REBUILD} ; then
               echo "Attempting to pull ${TAG}"
-              echo `docker pull ${TAG}`
+              docker pull ${TAG} \
+                && docker tag $TAG $OWNER/$IMAGE:latest \
+                || echo "Failed to pull image"
             fi
 
-            if $REBUILD_DOWNSTREAM ; then
+            # rebuild if necessary
+            if $REBUILD; then
               echo "Parent image changed, rebuilding"
               make $IMAGE
+              REBUILD=true
             elif [[ "$(docker images -q ${TAG} 2> /dev/null)" == "" ]]; then
-              echo "${IMAGE} not yet built for ref ${REF}, building"
+              echo "${IMAGE} not yet built for ref ${CI_COMMIT_REF_NAME}, building"
               make $IMAGE
-              REBUILD_DOWNSTREAM=true
+              REBUILD=true
             elif [[ -f $DOCKERFILE ]] && [[ ! "$(git diff HEAD~ $DOCKERFILE)" == "" ]]; then
               echo "Changes have been made to ${IMAGE}'s dockerfile, rebuilding"
               make $IMAGE
-              REBUILD_DOWNSTREAM=true
-            else
-              docker tag $TAG $OWNER/$IMAGE:latest
+              REBUILD=true
             fi
 
-            if $REBUILD_DOWNSTREAM ; then
+            # if we just rebuilt, push the container for possible later CI runs
+            if $REBUILD ; then
               echo "Logging in to internal gitlab container registry"
               echo ${CI_BUILD_TOKEN} | docker login --username gitlab-ci-token --password-stdin ${ONTREGISTRY};
               echo "Pushing ${TAG}";
@@ -128,9 +109,10 @@ build:docker:
               docker push ${TAG};
             fi;
           done;
-    # if dev branch, push a tag "dev-<commit_sha>",
-    # see also push:dev-dockerhub:
-    <<: *build-docker-after
+        # if dev branch, push a tag "dev-<commit_sha>",
+        # see also push:dev-dockerhub:
+        - *build-docker-after
+
 
 # manual build doing all images from scratch
 build:docker-manual:
@@ -138,14 +120,11 @@ build:docker-manual:
     when: manual
     before_script:
         - apk add make bash git openssl
+        - *get_dependency_versions
     script:
-        - tar -xzf ${GUPPY}
-        - make base-notebook
         - make picolabs-notebook
         - make nanolabs-notebook
-    # if dev branch, push a tag "dev-<commit_sha>",
-    # see also push:dev-dockerhub:
-    <<: *build-docker-after
+        - *build-docker-after
 
 
 # pull dev-<commit_sha> image tag from internal registry
