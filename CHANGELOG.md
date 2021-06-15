@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added jupyterlab-slash-copy-path to make copying paths within the container more seamless
 - Switched to using upstream base container
 - Updated aplanat to 0.4.0
-- Updated guppy barcoder to 5.0.7
+- Updated barcoder to 5.0.7
+- Updated medaka to 1.4.2
 
 ## [v0.4.1]
 ### Fixed
