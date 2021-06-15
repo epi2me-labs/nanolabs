@@ -73,6 +73,7 @@ RUN \
     aquirdturtle_collapsible_headings \
     jupyter_bokeh \
     jupyterlab-lsp \
+    jupyterlab-slash-copy-path \
     jupyterlab-autorun-cells \
     jupyterlab-play-cell-button \
     jupyterlab-code-cell-collapser \
