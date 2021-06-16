@@ -38,7 +38,6 @@ RUN \
     'bokeh=2.2.*' \
     'jinja2=2.11.3' \
     'conda-forge::blas=*=openblas' \
-    'ipywidgets=7.6.*' \
     'hdf5=1.12.0' \
     'jupyter-lsp=0.9.3' \
     'python-language-server=0.36.2' \
@@ -52,8 +51,9 @@ RUN \
     'scipy=1.6.*' \
     'widgetsnbextension=3.5.*' \
   && pip install --no-cache-dir \
-    'ipykernel==6.0.0b0' \
-    'ipython==7.23.1' \
+    'ipykernel==6.0.0rc0' \
+    'ipython==7.24.1' \
+    'ipywidgets==8.0.0.a4' \
   && mkdir ~/.parallel && touch ~/.parallel/will-cite \
   && conda clean --all -f -y \
   && conda init bash \
