@@ -80,7 +80,7 @@ RUN \
     epi2melabs-splashpage \
     epi2melabs-splash \
     epi2melabs-theme \
-    nbclassic>=0.2.8 \
+    nbclassic==0.3.1 \
   # build things
   && jupyter lab build -y --name='EPI2MELabs' --dev-build=False --minimize=True \
   && jupyter lab clean -y \
