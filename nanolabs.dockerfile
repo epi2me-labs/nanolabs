@@ -3,13 +3,11 @@
 # Modified for and by Oxford Nanopore Technologies
 ARG BASE_CONTAINER=ontresearch/picolabs-notebook:latest
 FROM $BASE_CONTAINER
-ARG DATE=unknown
 LABEL maintainer="Oxford Nanopore Technologies"
 
 ARG APLANAT_VERSION
 ARG EPI2MELABS_VERSION
 ARG MAPULA_VERSION
-
 RUN test -n "$APLANAT_VERSION" || (echo "APLANAT_VERSION  not set" && false)
 RUN test -n "$EPI2MELABS_VERSION" || (echo "EPI2MELABS_VERSION  not set" && false)
 RUN test -n "$MAPULA_VERSION" || (echo "MAPULA_VERSION  not set" && false)
@@ -37,10 +35,10 @@ USER $NB_UID
 RUN \
   mamba install --quiet --yes \
     "'aplanat=${APLANAT_VERSION}'" \
+    "'epi2melabs=${EPI2MELABS_VERSION}'" \
     'epi2melabs::barcoder=5.0.7_0' \
     'bedtools=2.29.2' \
     'bcftools=1.11' \
-    "'epi2melabs=${EPI2MELABS_VERSION}'" \
     'flye=2.8.1' \
     "'mapula=${MAPULA_VERSION}'" \
     'minimap2=2.17' \

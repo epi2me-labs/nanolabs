@@ -3,7 +3,6 @@
 # Modified for and by Oxford Nanopore Technologies
 ARG BASE_CONTAINER=jupyter/base-notebook
 FROM $BASE_CONTAINER
-
 LABEL maintainer="Oxford Nanopore Technologies"
 
 USER root
@@ -49,11 +48,11 @@ RUN \
     'protobuf=3.14.*' \
     'scikit-learn=0.24.*' \
     'scipy=1.6.*' \
-    'widgetsnbextension=3.5.*' \
-  && pip install --no-cache-dir \
-    'ipykernel==6.0.0rc0' \
-    'ipython==7.24.1' \
-    'ipywidgets==8.0.0.a4' \
+    # downgrade to fix "should_run_async" ipykernel warning
+    'ipython=7.10.*' \
+    'ipywidgets' \
+    # fix AttributeError: 'ExtensionManager' object has no attribute '_extensions'
+    'nbclassic=0.3.1' \
   && mkdir ~/.parallel && touch ~/.parallel/will-cite \
   && conda clean --all -f -y \
   && conda init bash \
@@ -62,13 +61,8 @@ RUN \
 
 # jupyter extensions
 RUN \
-  ## Activate ipywidgets extension in the environment that runs the notebook server
-  jupyter nbextension enable --py widgetsnbextension --sys-prefix \
-  ## Also activate ipywidgets extension for JupyterLab
-  && pip install jupyterlab_widgets \ 
-  # for JL3.x
-  ## our own modificationsa
-  && pip install --no-cache-dir \
+  # our own modifications
+  pip install --no-cache-dir \
     igv-jupyterlab \
     aquirdturtle_collapsible_headings \
     jupyter_bokeh \
@@ -80,7 +74,6 @@ RUN \
     epi2melabs-splashpage \
     epi2melabs-splash \
     epi2melabs-theme \
-    nbclassic==0.3.1 \
   # build things
   && jupyter lab build -y --name='EPI2MELabs' --dev-build=False --minimize=True \
   && jupyter lab clean -y \
@@ -103,6 +96,8 @@ COPY favicon.png /opt/conda/lib/python3.6/site-packages/notebook/static/base/ima
 # default theme (can this be in user-settings?)
 COPY overrides.json /opt/conda/share/jupyter/lab/settings/overrides.json
 # copy script for injecting user permissions
+# TODO: this is all a bit unnecessary, we could instead run directly as
+# host user, but add host user to the notebook group with docker --group-add
 ENV NB_HOST_USER=nbhost
 COPY run_as_user.sh /usr/local/bin/
 COPY startup.sh /usr/local/bin/start-notebook.d/
