@@ -36,7 +36,7 @@ RUN \
   mamba install --quiet --yes \
     "'aplanat=${APLANAT_VERSION}'" \
     "'epi2melabs=${EPI2MELABS_VERSION}'" \
-    'epi2melabs::barcoder=5.0.7_0' \
+    'epi2melabs::barcoder=5.0.11_0' \
     'bedtools=2.29.2' \
     'bcftools=1.12' \
     'flye=2.8.1' \
