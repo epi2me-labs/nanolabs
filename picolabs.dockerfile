@@ -30,14 +30,12 @@ RUN apt-get update \
 USER $NB_UID
 
 RUN \
-  conda config --system --append channels bioconda \
+  conda config --system --prepend channels bioconda \
   && conda config --system --prepend channels epi2melabs \
+  && conda config --system --append channels defaults \
   && conda install mamba --quiet --yes \
   && mamba install --quiet --yes --freeze-installed \
     'bokeh=2.2.*' \
-    'jinja2=2.11.3' \
-    'conda-forge::blas=*=openblas' \
-    'hdf5=1.12.0' \
     'jupyter-lsp=0.9.3' \
     'python-language-server=0.36.2' \
     'matplotlib-base=3.3.*' \
@@ -45,7 +43,6 @@ RUN \
     'conda-forge::r-essentials' \
     'parallel' \
     'pandas=1.2.*' \
-    'protobuf=3.14.*' \
     'scikit-learn=0.24.*' \
     'scipy=1.6.*' \
     # downgrade to fix "should_run_async" ipykernel warning
