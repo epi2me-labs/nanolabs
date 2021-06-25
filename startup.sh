@@ -3,10 +3,10 @@
 #   labslauncher application at certain times.
 #   The docker file installs it to /usr/local/bin/start-notebook.d/
 
-
 trust_path () {
     DIR=$1
-    for file in $(find ${DIR} -name "*.ipynb"); do
+    # careful of spaces in filenames
+    find ${DIR} -name "*.ipynb" -print0 | while read -d $'\0' file
         echo "Adding trust: ${file}"
         jupyter trust "${file}"
     done
