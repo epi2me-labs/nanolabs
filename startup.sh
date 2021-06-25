@@ -8,7 +8,7 @@ trust_path () {
     DIR=$1
     for file in $(find ${DIR} -name "*.ipynb"); do
         echo "Adding trust: ${file}"
-        jupyter trust ${file}
+        jupyter trust "${file}"
     done
 }
 
