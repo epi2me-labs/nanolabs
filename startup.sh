@@ -6,7 +6,7 @@
 trust_path () {
     DIR=$1
     # careful of spaces in filenames
-    find ${DIR} -name "*.ipynb" -print0 | while read -d $'\0' file
+    find ${DIR} -name "*.ipynb" -print0 | while read -d $'\0' file; do
         echo "Adding trust: ${file}"
         jupyter trust "${file}"
     done
